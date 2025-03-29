@@ -1,3 +1,3 @@
 module github.com/scagogogo/cve
 
-go 1.19
+go 1.18
