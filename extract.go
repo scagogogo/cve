@@ -5,6 +5,9 @@ import (
 	"strconv"
 )
 
+// 内部常量：用于匹配CVE格式的正则表达式
+var cveRegex = regexp.MustCompile(`(?i)(CVE-\d+-\d+)`)
+
 // ExtractCve 从字符串中抽取出所有CVE编号
 //
 // 提取文本中所有CVE编号并标准化格式
@@ -18,7 +21,7 @@ import (
 //
 //	从安全公告或漏洞报告中提取所有相关的CVE编号
 func ExtractCve(text string) []string {
-	slice := regexp.MustCompile(`(?i)(CVE-\d+-\d+)`).FindAllString(text, -1)
+	slice := cveRegex.FindAllString(text, -1)
 	for i, cve := range slice {
 		slice[i] = Format(cve)
 	}
@@ -38,7 +41,7 @@ func ExtractCve(text string) []string {
 //
 //	当只需要获取文本中第一个提到的CVE时使用
 func ExtractFirstCve(text string) string {
-	s := regexp.MustCompile(`(?i)(CVE-\d+-\d+)`).FindString(text)
+	s := cveRegex.FindString(text)
 	return Format(s)
 }
 
@@ -87,11 +90,16 @@ func ExtractCveYear(cve string) string {
 //
 //	输入: "CVE-2022-12345"
 //	输出: 2022 (整数类型)
+//	输入: "不是CVE格式"
+//	输出: 0
 //
 // 使用场景:
 //
 //	需要对CVE年份进行数值计算或比较时使用
 func ExtractCveYearAsInt(cve string) int {
+	if !IsCve(cve) {
+		return 0
+	}
 	year := ExtractCveYear(cve)
 	i, _ := strconv.Atoi(year)
 	return i
