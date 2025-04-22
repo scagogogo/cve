@@ -39,7 +39,7 @@ func Format(cve string) string {
 //	验证用户输入的字符串是否为有效的CVE编号
 func IsCve(text string) bool {
 	// 允许两侧有空白字符，但是不允许有除空白字符以外的其他字符
-	return regexp.MustCompile("(?i)^\\s*CVE-\\d+-\\d+\\s*$").MatchString(text)
+	return regexp.MustCompile(`(?i)^\s*CVE-\d+-\d+\s*$`).MatchString(text)
 }
 
 // IsContainsCve 判断字符串是否包含CVE
@@ -55,10 +55,26 @@ func IsCve(text string) bool {
 //
 //	从文章或报告中检测是否有提及CVE
 func IsContainsCve(text string) bool {
-	return regexp.MustCompile("(?i)CVE-\\d+-\\d+").MatchString(text)
+	return regexp.MustCompile(`(?i)CVE-\d+-\d+`).MatchString(text)
 }
 
 // IsCveYearOk 判断CVE的年份是否在合理的时间范围内
+//
+// 验证CVE年份是否在1970年之后且不超过当前年份
+//
+// 示例:
+//
+//	输入: "CVE-2022-12345" → 当前是2023年时返回 true
+//	输入: "CVE-2030-12345" → 当前是2023年时返回 false (2030 > 2023)
+//
+// 使用场景:
+//
+//	验证CVE年份的有效性
+func IsCveYearOk(cve string) bool {
+	return IsCveYearOkWithCutoff(cve, 0)
+}
+
+// IsCveYearOkWithCutoff 判断CVE的年份是否在合理的时间范围内，可设置偏移量
 //
 // 验证CVE年份是否在1970年之后且不超过当前年份加上cutoff偏移值
 //
@@ -75,7 +91,7 @@ func IsContainsCve(text string) bool {
 // 使用场景:
 //
 //	验证CVE年份的有效性，允许一定的未来年份偏移
-func IsCveYearOk(cve string, cutoff int) bool {
+func IsCveYearOkWithCutoff(cve string, cutoff int) bool {
 	year := ExtractCveYearAsInt(cve)
 	return year >= 1970 && time.Now().Year()-year <= cutoff
 }
@@ -93,7 +109,7 @@ func IsCveYearOk(cve string, cutoff int) bool {
 //
 //	从安全公告或漏洞报告中提取所有相关的CVE编号
 func ExtractCve(text string) []string {
-	slice := regexp.MustCompile("(?i)(CVE-\\d+-\\d+)").FindAllString(text, -1)
+	slice := regexp.MustCompile(`(?i)(CVE-\d+-\d+)`).FindAllString(text, -1)
 	for i, cve := range slice {
 		slice[i] = Format(cve)
 	}
@@ -119,7 +135,7 @@ func ExtractFirstCve(text string) string {
 	//}
 	//return slice[0]
 
-	s := regexp.MustCompile("(?i)(CVE-\\d+-\\d+)").FindString(text)
+	s := regexp.MustCompile(`(?i)(CVE-\d+-\d+)`).FindString(text)
 	return Format(s)
 }
 
@@ -342,9 +358,9 @@ func CompareCves(cveA, cveB string) int {
 	return 0
 }
 
-// SortCves 对CVE切片进行排序（按年份和序列号）
+// SortedCves 对CVE切片进行排序（按年份和序列号）并返回新的切片
 //
-// 将CVE列表按照年份和序列号排序，并统一格式
+// 将CVE列表按照年份和序列号排序，并统一格式，返回新的切片
 //
 // 示例:
 //
@@ -358,9 +374,9 @@ func CompareCves(cveA, cveB string) int {
 // 代码示例:
 //
 //	cveList := []string{"CVE-2022-2222", "cve-2020-1111", "CVE-2022-1111"}
-//	sortedList := cve.SortCves(cveList)
+//	sortedList := cve.SortedCves(cveList)
 //	// sortedList 为 ["CVE-2020-1111", "CVE-2022-1111", "CVE-2022-2222"]
-func SortCves(cveSlice []string) []string {
+func SortedCves(cveSlice []string) []string {
 	result := make([]string, len(cveSlice))
 	for i, cve := range cveSlice {
 		result[i] = Format(cve)
@@ -371,6 +387,13 @@ func SortCves(cveSlice []string) []string {
 	})
 
 	return result
+}
+
+// SortCves 是 SortedCves 的别名，为保持向后兼容
+//
+// 注意: 此函数不会修改原始切片，而是返回一个新的排序后的切片
+func SortCves(cveSlice []string) []string {
+	return SortedCves(cveSlice)
 }
 
 // GenerateCve 根据年份和序列号生成标准格式的CVE编号
@@ -551,4 +574,26 @@ func RemoveDuplicateCves(cveSlice []string) []string {
 	}
 
 	return result
+}
+
+// GenerateFakeCve 生成一个假的CVE编号
+//
+// 无需提供参数，自动使用当前年份和随机序列号生成假的CVE编号
+//
+// 示例:
+//
+//	生成结果类似: "CVE-2023-54321"（假设当前年份为2023）
+//
+// 使用场景:
+//
+//	用于测试、示例或者占位符
+//
+// 代码示例:
+//
+//	fakeCve := cve.GenerateFakeCve()
+//	// fakeCve 可能为 "CVE-2023-12345"
+func GenerateFakeCve() string {
+	currentYear := time.Now().Year()
+	randomSeq := 10000 + time.Now().Nanosecond()%90000
+	return GenerateCve(currentYear, randomSeq)
 }
