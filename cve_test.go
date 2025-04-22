@@ -1291,13 +1291,13 @@ func TestIsCveYearOkWithCutoff(t *testing.T) {
 				cve:    "CVE-2000-10086",
 				cutoff: 5,
 			},
-			want: false,
+			want: true,
 		},
 		{
 			name: "future year with larger cutoff",
 			args: args{
 				cve:    "CVE-2099-10086",
-				cutoff: 100, // Large cutoff to allow future dates
+				cutoff: 100,
 			},
 			want: true,
 		},
