@@ -7,6 +7,14 @@ import (
 	"time"
 )
 
+// 内部变量：用于验证和匹配CVE格式的正则表达式
+var (
+	// 精确匹配CVE格式（允许两侧有空白字符）
+	exactCveRegex = regexp.MustCompile(`(?i)^\s*CVE-\d+-\d+\s*$`)
+	// 在文本中匹配CVE格式
+	containsCveRegex = regexp.MustCompile(`(?i)CVE-\d+-\d+`)
+)
+
 // Format 把CVE的格式统一化
 //
 // 将CVE编号转换为标准大写格式并移除前后空格
@@ -37,7 +45,7 @@ func Format(cve string) string {
 //	验证用户输入的字符串是否为有效的CVE编号
 func IsCve(text string) bool {
 	// 允许两侧有空白字符，但是不允许有除空白字符以外的其他字符
-	return regexp.MustCompile(`(?i)^\s*CVE-\d+-\d+\s*$`).MatchString(text)
+	return exactCveRegex.MatchString(text)
 }
 
 // IsContainsCve 判断字符串是否包含CVE
@@ -53,7 +61,7 @@ func IsCve(text string) bool {
 //
 //	从文章或报告中检测是否有提及CVE
 func IsContainsCve(text string) bool {
-	return regexp.MustCompile(`(?i)CVE-\d+-\d+`).MatchString(text)
+	return containsCveRegex.MatchString(text)
 }
 
 // 内部函数：从CVE中提取年份并转为整数
@@ -69,11 +77,12 @@ func extractYear(cve string) int {
 
 // IsCveYearOk 判断CVE的年份是否在合理的时间范围内
 //
-// 验证CVE年份是否在1970年之后且不超过当前年份
+// 验证CVE年份是否在1999年之后且不超过当前年份
 //
 // 示例:
 //
 //	输入: "CVE-2022-12345" → 当前是2023年时返回 true
+//	输入: "CVE-1998-12345" → 返回 false (1998 < 1999)
 //	输入: "CVE-2030-12345" → 当前是2023年时返回 false (2030 > 2023)
 //
 // 使用场景:
@@ -85,7 +94,7 @@ func IsCveYearOk(cve string) bool {
 
 // IsCveYearOkWithCutoff 判断CVE的年份是否在合理的时间范围内，可设置偏移量
 //
-// 验证CVE年份是否在1970年之后且不超过当前年份加上cutoff偏移值
+// 验证CVE年份是否在1999年之后且不超过当前年份加上cutoff偏移值
 //
 // 参数:
 //
@@ -95,14 +104,15 @@ func IsCveYearOk(cve string) bool {
 // 示例:
 //
 //	输入: "CVE-2022-12345", 5 → 当前是2023年时返回 true
-//	输入: "CVE-2030-12345", 5 → 当前是2023年时返回 false (2030 > 2023+5)
+//	输入: "CVE-1998-12345", 5 → 返回 false (1998 < 1999)
+//	输入: "CVE-2030-12345", 5 → 当前是2023年时返回 true (2030 <= 2023+5)
 //
 // 使用场景:
 //
 //	验证CVE年份的有效性，允许一定的未来年份偏移
 func IsCveYearOkWithCutoff(cve string, cutoff int) bool {
 	year := extractYear(cve)
-	return year >= 1970 && year <= time.Now().Year()+cutoff
+	return year >= 1999 && year <= time.Now().Year()+cutoff
 }
 
 // Split 把CVE分割成年份和编号两部分
@@ -133,7 +143,7 @@ func Split(cve string) (year string, seq string) {
 // 示例:
 //
 //	输入: "CVE-2022-12345" → 当前年份为2023时返回 true
-//	输入: "CVE-1960-12345" → 返回 false (年份 < 1970)
+//	输入: "CVE-1998-12345" → 返回 false (年份 < 1999)
 //	输入: "CVE-2030-12345" → 当前年份为2023时返回 false (年份 > 当前年份)
 //	输入: "CVE-2022-ABC" → 返回 false (序列号不是数字)
 //
@@ -160,6 +170,6 @@ func ValidateCve(cve string) bool {
 		return false
 	}
 
-	// 基础验证规则：年份在1970至今，序列号为正整数
-	return yearInt >= 1970 && yearInt <= time.Now().Year() && seqInt > 0
+	// 基础验证规则：年份在1999至今，序列号为正整数
+	return yearInt >= 1999 && yearInt <= time.Now().Year() && seqInt > 0
 }
