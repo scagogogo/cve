@@ -126,7 +126,7 @@ func IsCveYearOk(cve string) bool
 - `cve` - CVE 编号
 
 **返回值**：
-- 如果年份在1970年之后且不超过当前年份则返回 `true`，否则返回 `false`
+- 如果年份在1999年之后且不超过当前年份则返回 `true`，否则返回 `false`
 
 **示例**：
 ```go
@@ -174,7 +174,7 @@ func ValidateCve(cve string) bool
 **示例**：
 ```go
 isValid := cve.ValidateCve("CVE-2022-12345")  // 正常情况返回 true
-isValid = cve.ValidateCve("CVE-1960-12345")  // 返回 false (年份 < 1970)
+isValid = cve.ValidateCve("CVE-1998-12345")  // 返回 false (年份 < 1999)
 isValid = cve.ValidateCve("CVE-2099-12345")  // 返回 false (假设当前为2023年，年份超前太多)
 ```
 
@@ -567,6 +567,19 @@ func GenerateCve(year int, seq int) string
 ```go
 cveId := cve.GenerateCve(2022, 12345)  // 返回 "CVE-2022-12345"
 ```
+
+## 项目结构
+
+本项目按功能模块拆分为多个文件:
+
+- **cve.go**: 包的主入口，包含版本信息
+- **base.go**: 基础功能，如格式化、验证CVE格式等
+- **extract.go**: 提取功能，从文本中提取CVE编号及其组成部分
+- **compare.go**: 比较功能，比较CVE的年份和序列号，排序等
+- **filter.go**: 过滤功能，按照年份范围过滤CVE，去重等
+- **generate.go**: 生成功能，创建标准格式的CVE编号
+
+每个功能模块都有对应的测试文件，确保功能正确性。
 
 ## 常见使用场景
 
