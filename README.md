@@ -119,7 +119,28 @@ contains = cve.IsContainsCve("这个文本不包含任何CVE标识符")  // 返�
 判断 CVE 的年份是否在合理的时间范围内。
 
 ```go
-func IsCveYearOk(cve string, cutoff int) bool
+func IsCveYearOk(cve string) bool
+```
+
+**参数**：
+- `cve` - CVE 编号
+
+**返回值**：
+- 如果年份在1970年之后且不超过当前年份则返回 `true`，否则返回 `false`
+
+**示例**：
+```go
+// 假设当前年份是2023年
+isYearOk := cve.IsCveYearOk("CVE-2022-12345")  // 返回 true
+isYearOk = cve.IsCveYearOk("CVE-2030-12345")   // 返回 false (2030 > 2023)
+```
+
+#### IsCveYearOkWithCutoff
+
+判断 CVE 的年份是否在合理的时间范围内，可设置允许的年份偏移量。
+
+```go
+func IsCveYearOkWithCutoff(cve string, cutoff int) bool
 ```
 
 **参数**：
@@ -132,8 +153,8 @@ func IsCveYearOk(cve string, cutoff int) bool
 **示例**：
 ```go
 // 假设当前年份是2023年
-isYearOk := cve.IsCveYearOk("CVE-2022-12345", 5)  // 返回 true
-isYearOk = cve.IsCveYearOk("CVE-2030-12345", 5)  // 返回 false (2030 > 2023+5)
+isYearOk := cve.IsCveYearOkWithCutoff("CVE-2022-12345", 5)  // 返回 true
+isYearOk = cve.IsCveYearOkWithCutoff("CVE-2030-12345", 5)  // 返回 false (2030 > 2023+5)
 ```
 
 #### ValidateCve
