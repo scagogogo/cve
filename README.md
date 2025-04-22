@@ -1636,3 +1636,23 @@ func main() {
 ## 📂 项目结构
 
 // ... existing code ...
+
+## ⭐ Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=scagogogo/cve&type=Date)](https://star-history.com/#scagogogo/cve&Date)
+
+## 🤝 贡献指南
+
+我们非常欢迎您的贡献！如果您有兴趣改进这个项目，请参考以下步骤：
+
+1. Fork 这个仓库
+2. 创建您的特性分支 (`git checkout -b feature/amazing-feature`)
+3. 提交您的更改 (`git commit -m 'feat: 添加了一些很棒的功能'`)
+4. 推送到分支 (`git push origin feature/amazing-feature`)
+5. 创建一个 Pull Request
+
+任何形式的贡献都将被感激，无论是新功能、文档改进、bug修复还是性能优化。
+
+## 📄 开源协议
+
+本项目采用 MIT 协议开源，详情请参阅 [LICENSE](LICENSE) 文件。
