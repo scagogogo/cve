@@ -1633,10 +1633,6 @@ func main() {
 }
 ```
 
-## 📂 项目结构
-
-// ... existing code ...
-
 ## ⭐ Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=scagogogo/cve&type=Date)](https://star-history.com/#scagogogo/cve&Date)
