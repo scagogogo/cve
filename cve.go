@@ -12,4 +12,4 @@
 package cve
 
 // Version 表示当前包的版本号
-const Version = "1.0.0"
+const Version = "v0.0.1"
