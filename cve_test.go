@@ -427,8 +427,7 @@ func TestSubByYear(t *testing.T) {
 
 func TestIsCveYearOk(t *testing.T) {
 	type args struct {
-		cve    string
-		cutoff int
+		cve string
 	}
 	tests := []struct {
 		name string
@@ -436,49 +435,37 @@ func TestIsCveYearOk(t *testing.T) {
 		want bool
 	}{
 		{
-			name: "valid year within cutoff",
+			name: "valid current year",
 			args: args{
-				cve:    "CVE-2020-10086",
-				cutoff: 5,
+				cve: fmt.Sprintf("CVE-%d-10086", time.Now().Year()),
 			},
 			want: true,
 		},
 		{
-			name: "valid year at exact cutoff",
+			name: "valid past year",
 			args: args{
-				cve:    "CVE-2019-10086",
-				cutoff: time.Now().Year() - 2019,
+				cve: "CVE-2020-10086",
 			},
 			want: true,
 		},
 		{
-			name: "valid year beyond cutoff",
+			name: "future year",
 			args: args{
-				cve:    "CVE-2000-10086",
-				cutoff: 5,
+				cve: fmt.Sprintf("CVE-%d-10086", time.Now().Year()+1),
 			},
 			want: false,
 		},
 		{
-			name: "future year with larger cutoff",
-			args: args{
-				cve:    "CVE-2099-10086",
-				cutoff: 100, // Large cutoff to allow future dates
-			},
-			want: true,
-		},
-		{
 			name: "year before 1970",
 			args: args{
-				cve:    "CVE-1969-10086",
-				cutoff: 100,
+				cve: "CVE-1969-10086",
 			},
 			want: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := IsCveYearOk(tt.args.cve, tt.args.cutoff); got != tt.want {
+			if got := IsCveYearOk(tt.args.cve); got != tt.want {
 				t.Errorf("IsCveYearOk() = %v, want %v", got, tt.want)
 			}
 		})
@@ -1267,6 +1254,66 @@ func TestRemoveDuplicateCves(t *testing.T) {
 			sort.Strings(tt.want)
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("RemoveDuplicateCves() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestIsCveYearOkWithCutoff(t *testing.T) {
+	type args struct {
+		cve    string
+		cutoff int
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "valid year within cutoff",
+			args: args{
+				cve:    "CVE-2020-10086",
+				cutoff: 5,
+			},
+			want: true,
+		},
+		{
+			name: "valid year at exact cutoff",
+			args: args{
+				cve:    "CVE-2019-10086",
+				cutoff: time.Now().Year() - 2019,
+			},
+			want: true,
+		},
+		{
+			name: "valid year beyond cutoff",
+			args: args{
+				cve:    "CVE-2000-10086",
+				cutoff: 5,
+			},
+			want: false,
+		},
+		{
+			name: "future year with larger cutoff",
+			args: args{
+				cve:    "CVE-2099-10086",
+				cutoff: 100, // Large cutoff to allow future dates
+			},
+			want: true,
+		},
+		{
+			name: "year before 1970",
+			args: args{
+				cve:    "CVE-1969-10086",
+				cutoff: 100,
+			},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := IsCveYearOkWithCutoff(tt.args.cve, tt.args.cutoff); got != tt.want {
+				t.Errorf("IsCveYearOkWithCutoff() = %v, want %v", got, tt.want)
 			}
 		})
 	}
