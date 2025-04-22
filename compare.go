@@ -39,7 +39,7 @@ func CompareByYear(cveA, cveB string) int {
 //
 //	计算两个CVE之间的年份间隔
 func SubByYear(cveA, cveB string) int {
-	return ExtractCveYearAsInt(cveA) - ExtractCveYearAsInt(cveB)
+	return CompareByYear(cveA, cveB)
 }
 
 // CompareCves 根据CVE的年份和序列号比较大小
@@ -81,7 +81,7 @@ func CompareCves(cveA, cveB string) int {
 	return 0
 }
 
-// SortedCves 对CVE切片进行排序（按年份和序列号）并返回新的切片
+// SortCves 对CVE切片进行排序（按年份和序列号）并返回新的切片
 //
 // 将CVE列表按照年份和序列号排序，并统一格式，返回新的切片
 //
@@ -97,9 +97,9 @@ func CompareCves(cveA, cveB string) int {
 // 代码示例:
 //
 //	cveList := []string{"CVE-2022-2222", "cve-2020-1111", "CVE-2022-1111"}
-//	sortedList := cve.SortedCves(cveList)
+//	sortedList := cve.SortCves(cveList)
 //	// sortedList 为 ["CVE-2020-1111", "CVE-2022-1111", "CVE-2022-2222"]
-func SortedCves(cveSlice []string) []string {
+func SortCves(cveSlice []string) []string {
 	result := make([]string, len(cveSlice))
 	for i, cve := range cveSlice {
 		result[i] = Format(cve)
@@ -110,11 +110,4 @@ func SortedCves(cveSlice []string) []string {
 	})
 
 	return result
-}
-
-// SortCves 是 SortedCves 的别名，为保持向后兼容
-//
-// 注意: 此函数不会修改原始切片，而是返回一个新的排序后的切片
-func SortCves(cveSlice []string) []string {
-	return SortedCves(cveSlice)
 }
