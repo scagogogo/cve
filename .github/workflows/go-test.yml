@@ -31,4 +31,14 @@ jobs:
       uses: codecov/codecov-action@v3
       with:
         file: ./coverage.txt
-        fail_ci_if_error: false 
+        fail_ci_if_error: false
+        
+    - name: Run all example code
+      run: |
+        echo "Running all example code..."
+        for example_dir in examples/*/; do
+          if [ -f "${example_dir}main.go" ]; then
+            echo "Running example: ${example_dir}"
+            (cd "${example_dir}" && go run .)
+          fi
+        done 
