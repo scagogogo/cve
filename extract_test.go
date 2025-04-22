@@ -101,6 +101,20 @@ func TestExtractCveYearAsInt(t *testing.T) {
 			},
 			want: 2001,
 		},
+		{
+			name: "invalid CVE format",
+			args: args{
+				cve: "not-a-cve",
+			},
+			want: 0,
+		},
+		{
+			name: "empty string",
+			args: args{
+				cve: "",
+			},
+			want: 0,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -152,6 +166,20 @@ func TestExtractLastCve(t *testing.T) {
 				text: "this is cve-2001-10086, this is CvE-2001-10087,",
 			},
 			want: "CVE-2001-10087",
+		},
+		{
+			name: "empty text",
+			args: args{
+				text: "",
+			},
+			want: "",
+		},
+		{
+			name: "text without CVE",
+			args: args{
+				text: "this text doesn't contain any CVE identifiers",
+			},
+			want: "",
 		},
 	}
 	for _, tt := range tests {

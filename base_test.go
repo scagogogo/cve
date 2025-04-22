@@ -123,6 +123,22 @@ func TestSplit(t *testing.T) {
 			wantYear: "2007",
 			wantSeq:  "10086",
 		},
+		{
+			name: "split CVE with invalid format",
+			args: args{
+				cve: "invalid-format",
+			},
+			wantYear: "",
+			wantSeq:  "",
+		},
+		{
+			name: "split empty string",
+			args: args{
+				cve: "",
+			},
+			wantYear: "",
+			wantSeq:  "",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -168,9 +184,9 @@ func TestIsCveYearOk(t *testing.T) {
 			want: false,
 		},
 		{
-			name: "year before 1970",
+			name: "year before 1999",
 			args: args{
-				cve: "CVE-1969-10086",
+				cve: "CVE-1998-10086",
 			},
 			want: false,
 		},
@@ -227,10 +243,18 @@ func TestIsCveYearOkWithCutoff(t *testing.T) {
 			want: true,
 		},
 		{
-			name: "year before 1970",
+			name: "year before 1999",
 			args: args{
-				cve:    "CVE-1969-10086",
+				cve:    "CVE-1998-10086",
 				cutoff: 100,
+			},
+			want: false,
+		},
+		{
+			name: "invalid CVE format",
+			args: args{
+				cve:    "CVE-INVALID-FORMAT",
+				cutoff: 0,
 			},
 			want: false,
 		},
@@ -289,9 +313,9 @@ func TestValidateCve(t *testing.T) {
 			want: false,
 		},
 		{
-			name: "invalid year - before 1970",
+			name: "invalid year - before 1999",
 			args: args{
-				cve: "CVE-1969-1234",
+				cve: "CVE-1998-1234",
 			},
 			want: false,
 		},
@@ -323,11 +347,101 @@ func TestValidateCve(t *testing.T) {
 			},
 			want: false,
 		},
+		{
+			name: "invalid year - non-numeric",
+			args: args{
+				cve: "CVE-YEAR-1234",
+			},
+			want: false,
+		},
+		{
+			name: "year too large for int conversion",
+			args: args{
+				cve: "CVE-99999999999999999999-1234",
+			},
+			want: false,
+		},
+		{
+			name: "sequence too large for int conversion",
+			args: args{
+				cve: "CVE-2022-99999999999999999999",
+			},
+			want: false,
+		},
+		{
+			name: "zero sequence number",
+			args: args{
+				cve: "CVE-2022-0",
+			},
+			want: false,
+		},
+		{
+			name: "negative sequence number",
+			args: args{
+				cve: "CVE-2022--1",
+			},
+			want: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := ValidateCve(tt.args.cve); got != tt.want {
 				t.Errorf("ValidateCve() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+// TestExtractYear 测试extractYear函数（直接测试内部函数以提高覆盖率）
+func TestExtractYear(t *testing.T) {
+	type args struct {
+		cve string
+	}
+	tests := []struct {
+		name string
+		args args
+		want int
+	}{
+		{
+			name: "valid CVE",
+			args: args{
+				cve: "CVE-2022-1234",
+			},
+			want: 2022,
+		},
+		{
+			name: "invalid format",
+			args: args{
+				cve: "not-a-cve",
+			},
+			want: 0,
+		},
+		{
+			name: "empty string",
+			args: args{
+				cve: "",
+			},
+			want: 0,
+		},
+		{
+			name: "missing components",
+			args: args{
+				cve: "CVE-2022",
+			},
+			want: 0,
+		},
+		{
+			name: "additional components",
+			args: args{
+				cve: "CVE-2022-1234-extra",
+			},
+			want: 0,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := extractYear(tt.args.cve); got != tt.want {
+				t.Errorf("extractYear() = %v, want %v", got, tt.want)
 			}
 		})
 	}
