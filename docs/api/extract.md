@@ -1,22 +1,22 @@
-# 提取方法
+# Extraction Methods
 
-这一类函数用于从文本中提取 CVE 信息，或从 CVE 编号中提取特定部分（如年份、序列号）。
+This category of functions is used to extract CVE information from text, or extract specific parts (such as year, sequence number) from CVE identifiers.
 
 ## ExtractCve
 
-从字符串中提取所有 CVE 编号。
+Extract all CVE identifiers from a string.
 
-### 函数签名
+### Function Signature
 
 ```go
 func ExtractCve(text string) []string
 ```
 
-### 参数
+### Parameters
 
-- `text` (string): 要从中提取 CVE 的文本
+- `text` (string): Text from which to extract CVEs
 
-### 返回值
+### Return Value
 
 - `[]string`: 提取的 CVE 编号列表，已格式化为标准格式
 

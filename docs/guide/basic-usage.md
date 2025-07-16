@@ -1,23 +1,23 @@
-# 基本使用
+# Basic Usage
 
-本指南将详细介绍 CVE Utils 的基本使用方法和最佳实践。
+This guide provides detailed instructions on the basic usage methods and best practices of CVE Utils.
 
-## 导入包
+## Import Package
 
-首先在您的 Go 代码中导入 CVE Utils：
+First, import CVE Utils in your Go code:
 
 ```go
 import "github.com/scagogogo/cve"
 ```
 
-## 核心概念
+## Core Concepts
 
-### CVE 格式规范
+### CVE Format Specification
 
-CVE 编号遵循以下格式：
-- 格式：`CVE-YYYY-NNNN`
-- `CVE`：固定前缀（不区分大小写）
-- `YYYY`：4位年份（1970年至今）
+CVE identifiers follow this format:
+- Format: `CVE-YYYY-NNNN`
+- `CVE`: Fixed prefix (case insensitive)
+- `YYYY`: 4-digit year (from 1970 to present)
 - `NNNN`：序列号（至少4位数字）
 
 有效的 CVE 示例：
