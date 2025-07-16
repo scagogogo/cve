@@ -1,66 +1,66 @@
-# API Reference
+# API 参考
 
-CVE Utils provides a complete set of CVE processing functions, covering everything from basic format validation to complex analysis and processing.
+CVE Utils 提供了一套完整的 CVE 处理函数，涵盖了从基本的格式化验证到复杂的分析处理的各个方面。
 
-## Function Categories
+## 函数分类
 
-### 🔍 [Format & Validation](/api/format-validate)
+### 🔍 [格式化与验证](/api/format-validate)
 
-Functions for CVE format standardization and validity verification:
+用于 CVE 格式标准化和有效性验证的函数：
 
-| Function | Description |
-|----------|-------------|
-| `Format(cve string) string` | Convert CVE to standard uppercase format |
-| `IsCve(text string) bool` | Check if string is a valid CVE format |
-| `IsContainsCve(text string) bool` | Check if string contains CVE |
-| `IsCveYearOk(cve string, cutoff int) bool` | Check if CVE year is reasonable |
-| `ValidateCve(cve string) bool` | Comprehensive validation of CVE identifier |
+| 函数 | 描述 |
+|------|------|
+| `Format(cve string) string` | 将 CVE 转换为标准大写格式 |
+| `IsCve(text string) bool` | 判断字符串是否为有效的 CVE 格式 |
+| `IsContainsCve(text string) bool` | 判断字符串是否包含 CVE |
+| `IsCveYearOk(cve string, cutoff int) bool` | 判断 CVE 年份是否合理 |
+| `ValidateCve(cve string) bool` | 全面验证 CVE 编号的合法性 |
 
-### 📝 [Extraction Methods](/api/extract)
+### 📝 [提取方法](/api/extract)
 
-Functions for extracting information from text or CVE:
+从文本或 CVE 中提取信息的函数：
 
-| Function | Description |
-|----------|-------------|
-| `ExtractCve(text string) []string` | Extract all CVE identifiers from text |
-| `ExtractFirstCve(text string) string` | Extract the first CVE identifier |
-| `ExtractLastCve(text string) string` | Extract the last CVE identifier |
-| `Split(cve string) (year string, seq string)` | Split CVE into year and sequence |
-| `ExtractCveYear(cve string) string` | Extract CVE year (string) |
-| `ExtractCveYearAsInt(cve string) int` | Extract CVE year (integer) |
-| `ExtractCveSeq(cve string) string` | Extract CVE sequence (string) |
-| `ExtractCveSeqAsInt(cve string) int` | Extract CVE sequence (integer) |
+| 函数 | 描述 |
+|------|------|
+| `ExtractCve(text string) []string` | 从文本中提取所有 CVE 编号 |
+| `ExtractFirstCve(text string) string` | 提取第一个 CVE 编号 |
+| `ExtractLastCve(text string) string` | 提取最后一个 CVE 编号 |
+| `Split(cve string) (year string, seq string)` | 分割 CVE 为年份和序列号 |
+| `ExtractCveYear(cve string) string` | 提取 CVE 年份（字符串） |
+| `ExtractCveYearAsInt(cve string) int` | 提取 CVE 年份（整数） |
+| `ExtractCveSeq(cve string) string` | 提取 CVE 序列号（字符串） |
+| `ExtractCveSeqAsInt(cve string) int` | 提取 CVE 序列号（整数） |
 
-### 🔄 [Comparison & Sorting](/api/compare-sort)
+### 🔄 [比较与排序](/api/compare-sort)
 
-Functions for CVE comparison and sorting:
+用于 CVE 比较和排序的函数：
 
-| Function | Description |
-|----------|-------------|
-| `CompareByYear(cveA, cveB string) int` | Compare two CVEs by year |
-| `SubByYear(cveA, cveB string) int` | Calculate year difference between two CVEs |
-| `CompareCves(cveA, cveB string) int` | Comprehensive comparison of two CVEs |
-| `SortCves(cveSlice []string) []string` | Sort CVE slice |
+| 函数 | 描述 |
+|------|------|
+| `CompareByYear(cveA, cveB string) int` | 根据年份比较两个 CVE |
+| `SubByYear(cveA, cveB string) int` | 计算两个 CVE 的年份差值 |
+| `CompareCves(cveA, cveB string) int` | 全面比较两个 CVE |
+| `SortCves(cveSlice []string) []string` | 对 CVE 切片进行排序 |
 
-### 🎯 [Filtering & Grouping](/api/filter-group)
+### 🎯 [过滤与分组](/api/filter-group)
 
-Functions for CVE filtering, grouping, and deduplication:
+用于 CVE 过滤、分组和去重的函数：
 
-| Function | Description |
-|----------|-------------|
-| `FilterCvesByYear(cveSlice []string, year int) []string` | Filter CVEs by specific year |
-| `FilterCvesByYearRange(cveSlice []string, startYear, endYear int) []string` | Filter CVEs by year range |
-| `GetRecentCves(cveSlice []string, years int) []string` | Get CVEs from recent years |
-| `GroupByYear(cveSlice []string) map[string][]string` | Group CVEs by year |
-| `RemoveDuplicateCves(cveSlice []string) []string` | Remove duplicate CVEs |
+| 函数 | 描述 |
+|------|------|
+| `FilterCvesByYear(cveSlice []string, year int) []string` | 筛选特定年份的 CVE |
+| `FilterCvesByYearRange(cveSlice []string, startYear, endYear int) []string` | 筛选年份范围内的 CVE |
+| `GetRecentCves(cveSlice []string, years int) []string` | 获取最近几年的 CVE |
+| `GroupByYear(cveSlice []string) map[string][]string` | 按年份分组 CVE |
+| `RemoveDuplicateCves(cveSlice []string) []string` | 移除重复的 CVE |
 
-### ⚡ [Generation & Construction](/api/generate)
+### ⚡ [生成与构造](/api/generate)
 
-Functions for generating new CVE identifiers:
+用于生成新 CVE 编号的函数：
 
-| Function | Description |
-|----------|-------------|
-| `GenerateCve(year int, seq int) string` | Generate CVE from year and sequence |
+| 函数 | 描述 |
+|------|------|
+| `GenerateCve(year int, seq int) string` | 根据年份和序列号生成 CVE |
 
 ## 快速参考
 

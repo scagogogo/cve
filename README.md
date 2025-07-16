@@ -7,50 +7,56 @@
 [![License](https://img.shields.io/github/license/scagogogo/cve)](https://github.com/scagogogo/cve/blob/main/LICENSE)
 [![Version](https://img.shields.io/badge/version-v0.0.1-blue)](https://github.com/scagogogo/cve/releases)
 
-CVE (Common Vulnerabilities and Exposures) 相关的工具方法集合。这个包提供了一系列用于处理、验证、提取和操作 CVE 标识符的实用函数。
+**🌐 Languages: [English](#english) | [简体中文](#简体中文)**
 
-## 📖 文档
+---
 
-**完整的 API 文档和使用指南请访问：[https://scagogogo.github.io/cve/](https://scagogogo.github.io/cve/)**
+## English
 
-文档包含：
-- 🚀 [快速开始指南](https://scagogogo.github.io/cve/guide/getting-started)
-- 📚 [完整 API 参考](https://scagogogo.github.io/cve/api/)
-- 💡 [实际使用示例](https://scagogogo.github.io/cve/examples/)
-- 🔧 [安装和配置](https://scagogogo.github.io/cve/guide/installation)
+A comprehensive collection of utility functions for handling CVE (Common Vulnerabilities and Exposures) identifiers. This package provides a series of practical functions for processing, validating, extracting, and manipulating CVE identifiers.
 
-## 📑 目录
+### 📖 Documentation
 
-- [功能特性](#-功能特性)
-- [安装](#-安装)
-- [快速开始](#-快速开始)
-- [API 参考文档](#-api-参考文档)
-  - [格式化与验证](#格式化与验证)
-  - [提取方法](#提取方法)
-  - [比较与排序](#比较与排序)
-  - [过滤与分组](#过滤与分组)
-  - [生成与构造](#生成与构造)
-- [使用场景示例](#-使用场景示例)
-- [项目结构](#-项目结构)
-- [参考资料](#-参考资料)
-- [许可证](#-许可证)
+**Complete API documentation and usage guides: [https://scagogogo.github.io/cve/](https://scagogogo.github.io/cve/)**
 
-## 🚀 功能特性
+Documentation includes:
+- 🚀 [Quick Start Guide](https://scagogogo.github.io/cve/guide/getting-started)
+- 📚 [Complete API Reference](https://scagogogo.github.io/cve/api/)
+- 💡 [Practical Examples](https://scagogogo.github.io/cve/examples/)
+- 🔧 [Installation & Configuration](https://scagogogo.github.io/cve/guide/installation)
 
-- ✅ CVE 格式验证和标准化
-- ✅ 从文本中提取 CVE 标识符
-- ✅ CVE 的年份和序列号提取与比较
-- ✅ CVE 的排序、过滤和分组
-- ✅ 生成标准格式的 CVE 标识符
-- ✅ 去重和验证工具
+### 📑 Table of Contents
 
-## 📦 安装
+- [Features](#-features)
+- [Installation](#-installation)
+- [Quick Start](#-quick-start)
+- [API Reference](#-api-reference)
+  - [Format & Validation](#format--validation)
+  - [Extraction Methods](#extraction-methods)
+  - [Comparison & Sorting](#comparison--sorting)
+  - [Filtering & Grouping](#filtering--grouping)
+  - [Generation & Construction](#generation--construction)
+- [Usage Examples](#-usage-examples)
+- [Project Structure](#-project-structure)
+- [References](#-references)
+- [License](#-license)
+
+### ✨ Features
+
+- ✅ CVE format validation and standardization
+- ✅ Extract CVE identifiers from text
+- ✅ Extract and compare CVE years and sequence numbers
+- ✅ Sort, filter, and group CVEs
+- ✅ Generate standard format CVE identifiers
+- ✅ Deduplication and validation tools
+
+### 📦 Installation
 
 ```bash
 go get github.com/scagogogo/cve
 ```
 
-## 🚦 快速开始
+### 🚦 Quick Start
 
 ### 基本使用
 
@@ -1660,6 +1666,83 @@ func main() {
 
 任何形式的贡献都将被感激，无论是新功能、文档改进、bug修复还是性能优化。
 
-## 📄 开源协议
+### 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 简体中文
+
+CVE (Common Vulnerabilities and Exposures) 相关的工具方法集合。这个包提供了一系列用于处理、验证、提取和操作 CVE 标识符的实用函数。
+
+### 📖 文档
+
+**完整的 API 文档和使用指南请访问：[https://scagogogo.github.io/cve/zh/](https://scagogogo.github.io/cve/zh/)**
+
+文档包含：
+- 🚀 [快速开始指南](https://scagogogo.github.io/cve/zh/guide/getting-started)
+- 📚 [完整 API 参考](https://scagogogo.github.io/cve/zh/api/)
+- 💡 [实际使用示例](https://scagogogo.github.io/cve/zh/examples/)
+- 🔧 [安装和配置](https://scagogogo.github.io/cve/zh/guide/installation)
+
+### 📑 目录
+
+- [功能特性](#功能特性-1)
+- [安装](#安装-1)
+- [快速开始](#快速开始-1)
+- [API 参考文档](#api-参考文档)
+  - [格式化与验证](#格式化与验证)
+  - [提取方法](#提取方法)
+  - [比较与排序](#比较与排序)
+  - [过滤与分组](#过滤与分组)
+  - [生成与构造](#生成与构造)
+- [使用场景示例](#使用场景示例)
+- [项目结构](#项目结构)
+- [参考资料](#参考资料)
+- [许可证](#许可证-1)
+
+### ✨ 功能特性
+
+- ✅ CVE 格式验证和标准化
+- ✅ 从文本中提取 CVE 标识符
+- ✅ CVE 的年份和序列号提取与比较
+- ✅ CVE 的排序、过滤和分组
+- ✅ 生成标准格式的 CVE 标识符
+- ✅ 去重和验证工具
+
+### 📦 安装
+
+```bash
+go get github.com/scagogogo/cve
+```
+
+### 🚦 快速开始
+
+```go
+package main
+
+import (
+    "fmt"
+    "github.com/scagogogo/cve"
+)
+
+func main() {
+    // 格式化 CVE
+    formatted := cve.Format("cve-2022-12345")
+    fmt.Println(formatted) // 输出: CVE-2022-12345
+
+    // 验证 CVE
+    isValid := cve.ValidateCve("CVE-2022-12345")
+    fmt.Println(isValid) // 输出: true
+
+    // 从文本中提取 CVE
+    text := "系统受到 CVE-2021-44228 和 CVE-2022-12345 的影响"
+    cves := cve.ExtractCve(text)
+    fmt.Println(cves) // 输出: [CVE-2021-44228 CVE-2022-12345]
+}
+```
+
+### 📄 许可证
 
 本项目采用 MIT 协议开源，详情请参阅 [LICENSE](LICENSE) 文件。

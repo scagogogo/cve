@@ -1,18 +1,18 @@
-# Getting Started
+# 快速开始
 
-Welcome to CVE Utils! This guide will help you quickly get started with this powerful CVE processing library.
+欢迎使用 CVE Utils！这个指南将帮助您快速上手使用这个强大的 CVE 处理工具库。
 
-## Installation
+## 安装
 
-### Install using go get
+### 使用 go get 安装
 
 ```bash
 go get github.com/scagogogo/cve
 ```
 
-### Verify Installation
+### 验证安装
 
-Create a simple test file to verify the installation was successful:
+创建一个简单的测试文件来验证安装是否成功：
 
 ```go
 // test.go
