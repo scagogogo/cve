@@ -1,31 +1,31 @@
-# 格式化与验证
+# Format & Validation
 
-这一类函数用于 CVE 格式的标准化和有效性验证，是 CVE 处理的基础功能。
+This category of functions is used for CVE format standardization and validity verification, which are the fundamental features of CVE processing.
 
 ## Format
 
-将 CVE 编号转换为标准大写格式并移除前后空格。
+Convert CVE identifier to standard uppercase format and remove leading/trailing spaces.
 
-### 函数签名
+### Function Signature
 
 ```go
 func Format(cve string) string
 ```
 
-### 参数
+### Parameters
 
-- `cve` (string): 要格式化的 CVE 编号
+- `cve` (string): CVE identifier to format
 
-### 返回值
+### Return Value
 
-- `string`: 标准化格式的 CVE 编号
+- `string`: Formatted CVE identifier
 
-### 功能描述
+### Description
 
-`Format` 函数执行以下操作：
-1. 移除字符串前后的空白字符
-2. 将整个字符串转换为大写
-3. 返回标准化的 CVE 格式
+The `Format` function performs the following operations:
+1. Remove leading and trailing whitespace characters
+2. Convert the entire string to uppercase
+3. Return the standardized CVE format
 
 ### 使用示例
 

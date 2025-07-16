@@ -1,23 +1,23 @@
-# 安装指南
+# Installation Guide
 
-本页面详细介绍如何在不同环境中安装和配置 CVE Utils。
+This page provides detailed instructions on how to install and configure CVE Utils in different environments.
 
-## 系统要求
+## System Requirements
 
-- Go 1.18 或更高版本
-- 支持的操作系统：Linux、macOS、Windows
+- Go 1.18 or higher
+- Supported operating systems: Linux, macOS, Windows
 
-## 安装方法
+## Installation Methods
 
-### 方法一：使用 go get（推荐）
+### Method 1: Using go get (Recommended)
 
-这是最简单和推荐的安装方法：
+This is the simplest and recommended installation method:
 
 ```bash
 go get github.com/scagogogo/cve
 ```
 
-### 方法二：使用 go mod
+### Method 2: Using go mod
 
 如果您使用 Go modules，可以在项目中直接导入：
 

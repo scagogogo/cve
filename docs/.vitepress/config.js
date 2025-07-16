@@ -10,79 +10,63 @@ export default defineConfig({
       label: 'English',
       lang: 'en',
       title: 'CVE Utils',
-      description: 'A comprehensive collection of utility functions for handling CVE identifiers'
+      description: 'A comprehensive collection of utility functions for handling CVE identifiers',
+      themeConfig: {
+        nav: [
+          { text: 'Home', link: '/' },
+          { text: 'API Docs', link: '/api/' },
+          { text: 'Quick Start', link: '/guide/getting-started' },
+          { text: 'Examples', link: '/examples/' },
+          { text: 'GitHub', link: 'https://github.com/scagogogo/cve' }
+        ],
+        sidebar: {
+          '/guide/': [
+            {
+              text: 'Guide',
+              items: [
+                { text: 'Getting Started', link: '/guide/getting-started' },
+                { text: 'Installation', link: '/guide/installation' },
+                { text: 'Basic Usage', link: '/guide/basic-usage' }
+              ]
+            }
+          ],
+          '/api/': [
+            {
+              text: 'API Reference',
+              items: [
+                { text: 'Overview', link: '/api/' },
+                { text: 'Format & Validation', link: '/api/format-validate' },
+                { text: 'Extraction Methods', link: '/api/extract' },
+                { text: 'Comparison & Sorting', link: '/api/compare-sort' },
+                { text: 'Filtering & Grouping', link: '/api/filter-group' },
+                { text: 'Generation & Construction', link: '/api/generate' }
+              ]
+            }
+          ],
+          '/examples/': [
+            {
+              text: 'Examples',
+              items: [
+                { text: 'Overview', link: '/examples/' },
+                { text: 'Vulnerability Analysis', link: '/examples/vulnerability-analysis' },
+                { text: 'Vulnerability Management', link: '/examples/vulnerability-management' },
+                { text: 'CVE Validation', link: '/examples/cve-validation' }
+              ]
+            }
+          ]
+        },
+        footer: {
+          message: 'Released under the MIT License.',
+          copyright: 'Copyright © 2024 scagogogo'
+        }
+      }
     },
     zh: {
       label: '简体中文',
       lang: 'zh-CN',
       title: 'CVE Utils',
-      description: 'CVE (Common Vulnerabilities and Exposures) 相关的工具方法集合'
-    }
-  },
-  
-  themeConfig: {
-    // English (root) configuration
-    nav: [
-      { text: 'Home', link: '/' },
-      { text: 'API Docs', link: '/api/' },
-      { text: 'Quick Start', link: '/guide/getting-started' },
-      { text: 'Examples', link: '/examples/' },
-      { text: 'GitHub', link: 'https://github.com/scagogogo/cve' }
-    ],
-
-    sidebar: {
-      '/guide/': [
-        {
-          text: 'Guide',
-          items: [
-            { text: 'Getting Started', link: '/guide/getting-started' },
-            { text: 'Installation', link: '/guide/installation' },
-            { text: 'Basic Usage', link: '/guide/basic-usage' }
-          ]
-        }
-      ],
-      '/api/': [
-        {
-          text: 'API Reference',
-          items: [
-            { text: 'Overview', link: '/api/' },
-            { text: 'Format & Validation', link: '/api/format-validate' },
-            { text: 'Extraction Methods', link: '/api/extract' },
-            { text: 'Comparison & Sorting', link: '/api/compare-sort' },
-            { text: 'Filtering & Grouping', link: '/api/filter-group' },
-            { text: 'Generation & Construction', link: '/api/generate' }
-          ]
-        }
-      ],
-      '/examples/': [
-        {
-          text: 'Examples',
-          items: [
-            { text: 'Overview', link: '/examples/' },
-            { text: 'Vulnerability Analysis', link: '/examples/vulnerability-analysis' },
-            { text: 'Vulnerability Management', link: '/examples/vulnerability-management' },
-            { text: 'CVE Validation', link: '/examples/cve-validation' }
-          ]
-        }
-      ]
-    },
-
-    socialLinks: [
-      { icon: 'github', link: 'https://github.com/scagogogo/cve' }
-    ],
-
-    footer: {
-      message: 'Released under the MIT License.',
-      copyright: 'Copyright © 2024 scagogogo'
-    },
-
-    search: {
-      provider: 'local'
-    },
-
-    // Localized theme config
-    locales: {
-      zh: {
+      description: 'CVE (Common Vulnerabilities and Exposures) 相关的工具方法集合',
+      themeConfig: {
         nav: [
           { text: '首页', link: '/zh/' },
           { text: 'API 文档', link: '/zh/api/' },
@@ -90,7 +74,6 @@ export default defineConfig({
           { text: '示例', link: '/zh/examples/' },
           { text: 'GitHub', link: 'https://github.com/scagogogo/cve' }
         ],
-
         sidebar: {
           '/zh/guide/': [
             {
@@ -127,12 +110,21 @@ export default defineConfig({
             }
           ]
         },
-
         footer: {
           message: '基于 MIT 许可证发布。',
           copyright: 'Copyright © 2024 scagogogo'
         }
       }
+    }
+  },
+
+  themeConfig: {
+    socialLinks: [
+      { icon: 'github', link: 'https://github.com/scagogogo/cve' }
+    ],
+
+    search: {
+      provider: 'local'
     }
   }
 })

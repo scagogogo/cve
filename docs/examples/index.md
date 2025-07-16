@@ -1,23 +1,23 @@
-# 使用示例
+# Examples
 
-本节提供了 CVE Utils 在实际场景中的使用示例，帮助您了解如何在真实项目中应用这些功能。
+This section provides practical examples of CVE Utils in real-world scenarios, helping you understand how to apply these features in actual projects.
 
-## 示例概览
+## Examples Overview
 
-### 📊 [漏洞报告分析](/examples/vulnerability-analysis)
+### 📊 [Vulnerability Report Analysis](/examples/vulnerability-analysis)
 
-学习如何从安全公告、漏洞报告和文档中提取、分析 CVE 信息：
+Learn how to extract and analyze CVE information from security bulletins, vulnerability reports, and documents:
 
-- 从文本中提取所有 CVE
-- 按年份分析漏洞分布
-- 生成统计报告
-- 识别漏洞趋势
+- Extract all CVEs from text
+- Analyze vulnerability distribution by year
+- Generate statistical reports
+- Identify vulnerability trends
 
-**适用场景**: 安全团队、漏洞研究、合规审计
+**Use Cases**: Security teams, vulnerability research, compliance auditing
 
-### 🗄️ [漏洞库管理](/examples/vulnerability-management)
+### 🗄️ [Vulnerability Management](/examples/vulnerability-management)
 
-了解如何管理和维护大型 CVE 数据库：
+Learn how to manage and maintain large CVE databases:
 
 - 数据导入和清洗
 - 去重和验证
