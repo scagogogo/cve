@@ -62,26 +62,26 @@ Functions for generating new CVE identifiers:
 |----------|-------------|
 | `GenerateCve(year int, seq int) string` | Generate CVE from year and sequence |
 
-## 快速参考
+## Quick Reference
 
-### 常用操作
+### Common Operations
 
 ```go
 import "github.com/scagogogo/cve"
 
-// 格式化
+// Format
 formatted := cve.Format(" cve-2022-12345 ")  // "CVE-2022-12345"
 
-// 验证
+// Validate
 isValid := cve.ValidateCve("CVE-2022-12345")  // true
 
-// 提取
-cves := cve.ExtractCve("文本包含 CVE-2022-12345")  // ["CVE-2022-12345"]
+// Extract
+cves := cve.ExtractCve("Text contains CVE-2022-12345")  // ["CVE-2022-12345"]
 
-// 排序
+// Sort
 sorted := cve.SortCves([]string{"CVE-2022-2", "CVE-2021-1"})
 
-// 分组
+// Group
 grouped := cve.GroupByYear([]string{"CVE-2021-1", "CVE-2022-1"})
 ```
 
