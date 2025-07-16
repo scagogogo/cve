@@ -85,69 +85,69 @@ sorted := cve.SortCves([]string{"CVE-2022-2", "CVE-2021-1"})
 grouped := cve.GroupByYear([]string{"CVE-2021-1", "CVE-2022-1"})
 ```
 
-### 函数返回值说明
+### Function Return Types
 
-| 返回类型 | 说明 | 示例 |
-|----------|------|------|
-| `string` | 单个字符串结果，无效输入返回空字符串 | `"CVE-2022-12345"` |
-| `[]string` | 字符串切片，无结果返回空切片 | `["CVE-2022-1", "CVE-2022-2"]` |
-| `bool` | 布尔值，表示是/否或真/假 | `true` |
-| `int` | 整数，无效输入通常返回 0 | `2022` |
-| `map[string][]string` | 字符串到字符串切片的映射 | `{"2022": ["CVE-2022-1"]}` |
+| Return Type | Description | Example |
+|-------------|-------------|---------|
+| `string` | Single string result, returns empty string for invalid input | `"CVE-2022-12345"` |
+| `[]string` | String slice, returns empty slice when no results | `["CVE-2022-1", "CVE-2022-2"]` |
+| `bool` | Boolean value, indicates yes/no or true/false | `true` |
+| `int` | Integer, usually returns 0 for invalid input | `2022` |
+| `map[string][]string` | Map from string to string slice | `{"2022": ["CVE-2022-1"]}` |
 
-### 错误处理
+### Error Handling
 
-CVE Utils 的函数设计为对无效输入有良好的容错性：
+CVE Utils functions are designed with good fault tolerance for invalid input:
 
-- 字符串函数对无效输入返回空字符串 `""`
-- 整数函数对无效输入返回 `0`
-- 切片函数对无效输入返回空切片 `[]string{}`
-- 布尔函数返回 `false` 表示无效或不匹配
+- String functions return empty string `""` for invalid input
+- Integer functions return `0` for invalid input
+- Slice functions return empty slice `[]string{}` for invalid input
+- Boolean functions return `false` for invalid or non-matching input
 
-### 性能特性
+### Performance Characteristics
 
-- **内存效率**：函数避免不必要的内存分配
-- **并发安全**：所有函数都是并发安全的（无状态）
-- **正则表达式优化**：内部使用编译后的正则表达式
-- **批量处理**：支持高效的批量操作
+- **Memory Efficient**: Functions avoid unnecessary memory allocations
+- **Concurrency Safe**: All functions are concurrency-safe (stateless)
+- **Regex Optimization**: Uses compiled regular expressions internally
+- **Batch Processing**: Supports efficient batch operations
 
-## 使用模式
+## Usage Patterns
 
-### 1. 数据清洗流水线
+### 1. Data Cleaning Pipeline
 
 ```go
 func cleanCveData(rawData []string) []string {
-    // 1. 提取所有可能的 CVE
+    // 1. Extract all possible CVEs
     var allCves []string
     for _, text := range rawData {
         cves := cve.ExtractCve(text)
         allCves = append(allCves, cves...)
     }
-    
-    // 2. 去重
+
+    // 2. Remove duplicates
     unique := cve.RemoveDuplicateCves(allCves)
-    
-    // 3. 验证
+
+    // 3. Validate
     var valid []string
     for _, cveId := range unique {
         if cve.ValidateCve(cveId) {
             valid = append(valid, cveId)
         }
     }
-    
-    // 4. 排序
+
+    // 4. Sort
     return cve.SortCves(valid)
 }
 ```
 
-### 2. 条件过滤
+### 2. Conditional Filtering
 
 ```go
 func filterRecentHighPriority(cveList []string) []string {
-    // 获取最近2年的 CVE
+    // Get CVEs from recent 2 years
     recent := cve.GetRecentCves(cveList, 2)
-    
-    // 进一步过滤（示例：序列号大于10000的）
+
+    // Further filtering (example: sequence number > 10000)
     var highPriority []string
     for _, cveId := range recent {
         if cve.ExtractCveSeqAsInt(cveId) > 10000 {
@@ -159,23 +159,23 @@ func filterRecentHighPriority(cveList []string) []string {
 }
 ```
 
-### 3. 统计分析
+### 3. Statistical Analysis
 
 ```go
 func analyzeCveDistribution(cveList []string) {
-    // 按年份分组
+    // Group by year
     grouped := cve.GroupByYear(cveList)
-    
-    // 统计每年的数量
+
+    // Count for each year
     for year, cves := range grouped {
-        fmt.Printf("%s年: %d个 CVE\n", year, len(cves))
-        
-        // 分析序列号范围
+        fmt.Printf("Year %s: %d CVEs\n", year, len(cves))
+
+        // Analyze sequence number range
         if len(cves) > 0 {
             sorted := cve.SortCves(cves)
             firstSeq := cve.ExtractCveSeqAsInt(sorted[0])
             lastSeq := cve.ExtractCveSeqAsInt(sorted[len(sorted)-1])
-            fmt.Printf("  序列号范围: %d - %d\n", firstSeq, lastSeq)
+            fmt.Printf("  Sequence range: %d - %d\n", firstSeq, lastSeq)
         }
     }
 }
