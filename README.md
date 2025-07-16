@@ -1,8 +1,19 @@
 # CVE Utils
 
 [![Go Tests](https://github.com/scagogogo/cve/actions/workflows/go-test.yml/badge.svg)](https://github.com/scagogogo/cve/actions/workflows/go-test.yml)
+[![Documentation](https://github.com/scagogogo/cve/actions/workflows/docs.yml/badge.svg)](https://github.com/scagogogo/cve/actions/workflows/docs.yml)
 
 CVE (Common Vulnerabilities and Exposures) 相关的工具方法集合。这个包提供了一系列用于处理、验证、提取和操作 CVE 标识符的实用函数。
+
+## 📖 文档
+
+**完整的 API 文档和使用指南请访问：[https://scagogogo.github.io/cve/](https://scagogogo.github.io/cve/)**
+
+文档包含：
+- 🚀 [快速开始指南](https://scagogogo.github.io/cve/guide/getting-started)
+- 📚 [完整 API 参考](https://scagogogo.github.io/cve/api/)
+- 💡 [实际使用示例](https://scagogogo.github.io/cve/examples/)
+- 🔧 [安装和配置](https://scagogogo.github.io/cve/guide/installation)
 
 ## 功能特性
 
