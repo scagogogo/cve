@@ -181,22 +181,22 @@ func analyzeCveDistribution(cveList []string) {
 }
 ```
 
-## 版本兼容性
+## Version Compatibility
 
-当前 API 版本：`v1.0.0`
+Current API version: `v1.0.0`
 
-- ✅ **稳定 API**：所有公开函数的签名保持稳定
-- ✅ **向后兼容**：新版本保持向后兼容
-- ✅ **语义版本**：遵循语义版本规范
+- ✅ **Stable API**: All public function signatures remain stable
+- ✅ **Backward Compatible**: New versions maintain backward compatibility
+- ✅ **Semantic Versioning**: Follows semantic versioning specification
 
-## 下一步
+## Next Steps
 
-选择您感兴趣的 API 分类深入了解：
+Choose the API category you're interested in to learn more:
 
-- [格式化与验证](/api/format-validate) - 学习如何验证和标准化 CVE
-- [提取方法](/api/extract) - 了解如何从文本中提取 CVE 信息
-- [比较与排序](/api/compare-sort) - 掌握 CVE 比较和排序技巧
-- [过滤与分组](/api/filter-group) - 学习高级的过滤和分组操作
-- [生成与构造](/api/generate) - 了解如何生成新的 CVE 编号
+- [Format & Validation](/api/format-validate) - Learn how to validate and standardize CVEs
+- [Extraction Methods](/api/extract) - Understand how to extract CVE information from text
+- [Comparison & Sorting](/api/compare-sort) - Master CVE comparison and sorting techniques
+- [Filtering & Grouping](/api/filter-group) - Learn advanced filtering and grouping operations
+- [Generation & Construction](/api/generate) - Understand how to generate new CVE identifiers
 
-或者查看 [使用示例](/examples/) 了解实际应用场景。
+Or check out [Examples](/examples/) to see real-world usage scenarios.
