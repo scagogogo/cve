@@ -24,29 +24,29 @@ import (
 )
 
 func main() {
-    // 测试基本功能
+    // Test basic functionality
     result := cve.Format("cve-2022-12345")
-    fmt.Println("格式化结果:", result)
-    
+    fmt.Println("Format result:", result)
+
     if result == "CVE-2022-12345" {
-        fmt.Println("✅ CVE Utils 安装成功！")
+        fmt.Println("✅ CVE Utils installed successfully!")
     } else {
-        fmt.Println("❌ 安装可能有问题")
+        fmt.Println("❌ Installation may have issues")
     }
 }
 ```
 
-运行测试：
+Run the test:
 
 ```bash
 go run test.go
 ```
 
-## 基本概念
+## Basic Concepts
 
-### CVE 格式
+### CVE Format
 
-CVE (Common Vulnerabilities and Exposures) 编号遵循特定的格式：
+CVE (Common Vulnerabilities and Exposures) identifiers follow a specific format:
 
 ```
 CVE-YYYY-NNNN
