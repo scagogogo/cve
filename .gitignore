@@ -1,3 +1,6 @@
+# CLI binary
+/cve
+
 # Binaries for programs and plugins
 *.exe
 *.exe~
