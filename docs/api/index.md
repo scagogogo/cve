@@ -62,6 +62,11 @@ Functions for generating new CVE identifiers:
 |----------|-------------|
 | `GenerateCve(year int, seq int) string` | Generate CVE from year and sequence |
 
+- **Set Operations**: Compute intersection, union, and difference of CVE lists — [View Docs](/api/set-operations)
+- **Batch Validation**: Validate CVEs in batch with detailed error reporting — [View Docs](/api/batch-validation)
+- **Range & Pattern**: Parse CVE range expressions, filter by wildcard patterns — [View Docs](/api/range-pattern)
+- **Statistical Analysis**: Count by year, get year/sequence ranges — [View Docs](/api/statistics)
+
 ## Quick Reference
 
 ### Common Operations

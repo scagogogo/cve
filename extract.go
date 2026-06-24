@@ -264,3 +264,67 @@ func ExtractCveSeqAsInt(cve string) int {
 	i, _ := strconv.Atoi(seq)
 	return i
 }
+
+// FilterCvesByPattern 根据通配符模式筛选CVE列表
+//
+// 支持简单的通配符模式匹配：
+//   - "*" 匹配任意内容
+//   - "CVE-2022-*" 匹配2022年的所有CVE
+//   - "CVE-*-1234" 匹配序列号为1234的所有年份的CVE
+//   - "CVE-2022-1*" 匹配2022年以1开头的序列号
+//
+// 参数:
+//   - cveSlice: 需要筛选的CVE编号数组
+//   - pattern: 通配符模式，自动格式化为大写
+//
+// 返回值:
+//   - []string: 匹配模式的所有CVE编号，已格式化和排序
+//
+// 示例:
+//
+//	输入: ["CVE-2022-1111", "CVE-2022-2222", "CVE-2023-1111"], "CVE-2022-*"
+//	输出: ["CVE-2022-1111", "CVE-2022-2222"]
+//
+//	输入: ["CVE-2022-1111", "CVE-2021-1111", "CVE-2023-2222"], "CVE-*-1111"
+//	输出: ["CVE-2021-1111", "CVE-2022-1111"]
+//
+// 使用场景:
+//   - 通过通配符快速筛选CVE
+//   - 构建灵活的CVE查询功能
+//
+// 代码示例:
+//
+//	cves2022 := cve.FilterCvesByPattern(cveList, "CVE-2022-*")
+//	cve1111 := cve.FilterCvesByPattern(cveList, "CVE-*-1111")
+func FilterCvesByPattern(cveSlice []string, pattern string) []string {
+	pattern = Format(pattern)
+	// 将通配符模式转换为正则表达式
+	patternParts := []rune(pattern)
+	var regexParts []rune
+	for _, ch := range patternParts {
+		switch ch {
+		case '*':
+			regexParts = append(regexParts, []rune(".*")...)
+		case '.', '+', '(', ')', '[', ']', '{', '}', '\\', '^', '$', '|':
+			// 转义正则特殊字符
+			regexParts = append(regexParts, '\\', ch)
+		default:
+			regexParts = append(regexParts, ch)
+		}
+	}
+
+	regex, err := regexp.Compile(string(regexParts))
+	if err != nil {
+		return nil
+	}
+
+	var result []string
+	for _, cve := range cveSlice {
+		formatted := Format(cve)
+		if regex.MatchString(formatted) {
+			result = append(result, formatted)
+		}
+	}
+
+	return SortCves(result)
+}

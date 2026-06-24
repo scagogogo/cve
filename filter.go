@@ -189,6 +189,179 @@ func GetRecentCves(cveSlice []string, years int) []string {
 	return FilterCvesByYearRange(cveSlice, currentYear-years+1, currentYear)
 }
 
+// IntersectCves 求两个CVE列表的交集
+//
+// 返回同时出现在两个列表中的CVE编号，结果已去重和格式化为大写
+//
+// 参数:
+//   - a: 第一个CVE列表
+//   - b: 第二个CVE列表
+//
+// 返回值:
+//   - []string: 两个列表的共有CVE编号，已排序
+//
+// 比较规则:
+//   - CVE比较时不区分大小写
+//   - 结果按年份和序列号升序排列
+//
+// 示例:
+//
+//	输入: ["CVE-2022-1111", "CVE-2022-2222"], ["CVE-2022-2222", "CVE-2022-3333"]
+//	输出: ["CVE-2022-2222"]
+//
+//	输入: ["CVE-2022-1111"], ["CVE-2023-2222"]
+//	输出: [] (空数组)
+//
+// 性能特性:
+//   - 时间复杂度: O(n+m)，其中n和m分别为两个列表的长度
+//   - 空间复杂度: O(min(n,m))
+//
+// 使用场景:
+//   - 多源CVE数据交叉对比
+//   - 找出多个安全报告中共同提及的漏洞
+//
+// 代码示例:
+//
+//	list1 := []string{"CVE-2022-1111", "CVE-2022-2222"}
+//	list2 := []string{"CVE-2022-2222", "CVE-2022-3333"}
+//	common := cve.IntersectCves(list1, list2)
+//	// common 为 ["CVE-2022-2222"]
+func IntersectCves(a, b []string) []string {
+	set := make(map[string]struct{}, len(a))
+	for _, cve := range a {
+		set[Format(cve)] = struct{}{}
+	}
+
+	var result []string
+	seen := make(map[string]struct{}, len(b))
+	for _, cve := range b {
+		formatted := Format(cve)
+		if _, inA := set[formatted]; inA {
+			if _, exists := seen[formatted]; !exists {
+				seen[formatted] = struct{}{}
+				result = append(result, formatted)
+			}
+		}
+	}
+
+	return SortCves(result)
+}
+
+// UnionCves 求两个CVE列表的并集
+//
+// 合并两个列表中的所有CVE编号，结果已去重和格式化为大写
+//
+// 参数:
+//   - a: 第一个CVE列表
+//   - b: 第二个CVE列表
+//
+// 返回值:
+//   - []string: 两个列表的所有CVE编号（去重），已排序
+//
+// 比较规则:
+//   - CVE比较时不区分大小写
+//   - 结果按年份和序列号升序排列
+//
+// 示例:
+//
+//	输入: ["CVE-2022-1111", "CVE-2022-2222"], ["CVE-2022-2222", "CVE-2022-3333"]
+//	输出: ["CVE-2022-1111", "CVE-2022-2222", "CVE-2022-3333"]
+//
+// 性能特性:
+//   - 时间复杂度: O(n+m)，其中n和m分别为两个列表的长度
+//   - 空间复杂度: O(n+m)
+//
+// 使用场景:
+//   - 合并多个来源的CVE列表
+//   - 整合多方安全通告中的漏洞信息
+//
+// 代码示例:
+//
+//	list1 := []string{"CVE-2022-1111", "CVE-2022-2222"}
+//	list2 := []string{"CVE-2022-2222", "CVE-2022-3333"}
+//	all := cve.UnionCves(list1, list2)
+//	// all 为 ["CVE-2022-1111", "CVE-2022-2222", "CVE-2022-3333"]
+func UnionCves(a, b []string) []string {
+	set := make(map[string]struct{}, len(a)+len(b))
+	var result []string
+
+	for _, cve := range a {
+		formatted := Format(cve)
+		if _, exists := set[formatted]; !exists {
+			set[formatted] = struct{}{}
+			result = append(result, formatted)
+		}
+	}
+
+	for _, cve := range b {
+		formatted := Format(cve)
+		if _, exists := set[formatted]; !exists {
+			set[formatted] = struct{}{}
+			result = append(result, formatted)
+		}
+	}
+
+	return SortCves(result)
+}
+
+// DiffCves 求两个CVE列表的差集（a有b无）
+//
+// 返回在列表a中出现但不在列表b中出现的CVE编号
+//
+// 参数:
+//   - a: 被减CVE列表
+//   - b: 需要排除的CVE列表
+//
+// 返回值:
+//   - []string: 只在列表a中出现的CVE编号，已去重和格式化，已排序
+//
+// 比较规则:
+//   - CVE比较时不区分大小写
+//   - 结果按年份和序列号升序排列
+//
+// 示例:
+//
+//	输入: a=["CVE-2022-1111", "CVE-2022-2222"], b=["CVE-2022-2222", "CVE-2022-3333"]
+//	输出: ["CVE-2022-1111"]
+//
+//	输入: a=["CVE-2022-1111","CVE-2022-1111"], b=["CVE-2022-3333"]
+//	输出: ["CVE-2022-1111"] (注意输入a中的重复已被去除)
+//
+// 性能特性:
+//   - 时间复杂度: O(n+m)，其中n和m分别为两个列表的长度
+//   - 空间复杂度: O(n+m)
+//
+// 使用场景:
+//   - 找出新增的CVE（与历史数据对比）
+//   - 检测某个列表中独有的漏洞
+//
+// 代码示例:
+//
+//	current := []string{"CVE-2022-1111", "CVE-2022-2222"}
+//	historical := []string{"CVE-2022-2222", "CVE-2022-3333"}
+//	newCves := cve.DiffCves(current, historical)
+//	// newCves 为 ["CVE-2022-1111"] — 历史列表中未出现的新CVE
+func DiffCves(a, b []string) []string {
+	bSet := make(map[string]struct{}, len(b))
+	for _, cve := range b {
+		bSet[Format(cve)] = struct{}{}
+	}
+
+	aSeen := make(map[string]struct{}, len(a))
+	var result []string
+	for _, cve := range a {
+		formatted := Format(cve)
+		if _, inB := bSet[formatted]; !inB {
+			if _, exists := aSeen[formatted]; !exists {
+				aSeen[formatted] = struct{}{}
+				result = append(result, formatted)
+			}
+		}
+	}
+
+	return SortCves(result)
+}
+
 // RemoveDuplicateCves 移除重复的CVE编号
 //
 // 去除CVE列表中的重复项，保留唯一的CVE编号（不区分大小写）
@@ -238,4 +411,145 @@ func RemoveDuplicateCves(cveSlice []string) []string {
 	}
 
 	return result
+}
+
+// CountByYear 统计CVE列表中各年份的数量
+//
+// 对CVE列表按年份进行计数，返回年份到数量的映射
+//
+// 参数:
+//   - cveSlice: 需要统计的CVE编号数组
+//
+// 返回值:
+//   - map[int]int: 年份到CVE数量的映射，key为年份，value为该年份的CVE数量
+//
+// 示例:
+//
+//	输入: ["CVE-2022-1111", "CVE-2022-2222", "CVE-2021-3333", "cve-2022-4444"]
+//	输出: {2021: 1, 2022: 3}
+//
+// 使用场景:
+//   - CVE趋势分析：了解各年份的漏洞分布
+//   - 安全报告：生成年度CVE统计
+//
+// 代码示例:
+//
+//	counts := cve.CountByYear(cveList)
+//	for year, count := range counts {
+//	    fmt.Printf("%d: %d CVEs\n", year, count)
+//	}
+func CountByYear(cveSlice []string) map[int]int {
+	result := make(map[int]int)
+	for _, cve := range cveSlice {
+		year := ExtractCveYearAsInt(cve)
+		if year > 0 {
+			result[year]++
+		}
+	}
+	return result
+}
+
+// YearRange 获取CVE列表中最早和最晚的年份
+//
+// 返回CVE列表中年份的最小值和最大值
+//
+// 参数:
+//   - cveSlice: CVE编号数组
+//
+// 返回值:
+//   - min: 最早的年份（最小值），如果列表为空或没有有效CVE则返回0
+//   - max: 最晚的年份（最大值），如果列表为空或没有有效CVE则返回0
+//
+// 示例:
+//
+//	输入: ["CVE-2020-1111", "CVE-2022-2222", "CVE-2021-3333"]
+//	输出: min=2020, max=2022
+//
+//	输入: [] (空数组)
+//	输出: min=0, max=0
+//
+// 使用场景:
+//   - 确定CVE数据的时间跨度
+//   - 生成时间范围描述
+//
+// 代码示例:
+//
+//	minYear, maxYear := cve.YearRange(cveList)
+//	fmt.Printf("CVEs span from %d to %d\n", minYear, maxYear)
+func YearRange(cveSlice []string) (min, max int) {
+	if len(cveSlice) == 0 {
+		return 0, 0
+	}
+
+	min = -1
+	for _, cve := range cveSlice {
+		year := ExtractCveYearAsInt(cve)
+		if year <= 0 {
+			continue
+		}
+		if min == -1 || year < min {
+			min = year
+		}
+		if year > max {
+			max = year
+		}
+	}
+
+	if min == -1 {
+		return 0, 0
+	}
+	return min, max
+}
+
+// SeqRange 获取指定年份下CVE序列号的范围
+//
+// 从CVE列表中筛选出指定年份的CVE，然后返回其序列号的最小值和最大值
+//
+// 参数:
+//   - cveSlice: CVE编号数组
+//   - year: 目标年份
+//
+// 返回值:
+//   - min: 该年份下的最小序列号，如果没有找到则返回0
+//   - max: 该年份下的最大序列号，如果没有找到则返回0
+//
+// 示例:
+//
+//	输入: ["CVE-2022-1111", "CVE-2022-5555", "CVE-2022-3333", "CVE-2021-9999"], 2022
+//	输出: min=1111, max=5555
+//
+//	输入: ["CVE-2022-1111"], 2023
+//	输出: min=0, max=0
+//
+// 使用场景:
+//   - 了解某个年份CVE编号的分配范围
+//   - 估算CVE密度的辅助信息
+//
+// 代码示例:
+//
+//	minSeq, maxSeq := cve.SeqRange(cveList, 2022)
+//	fmt.Printf("2022年CVE序列号范围: %d - %d\n", minSeq, maxSeq)
+func SeqRange(cveSlice []string, year int) (min, max int) {
+	min = -1
+	for _, cve := range cveSlice {
+		cveYear := ExtractCveYearAsInt(cve)
+		if cveYear != year {
+			continue
+		}
+		seq := ExtractCveSeqAsInt(cve)
+		if seq <= 0 {
+			continue
+		}
+		if min == -1 || seq < min {
+			min = seq
+		}
+		if seq > max {
+			max = seq
+		}
+	}
+
+	if min == -1 {
+		return 0, 0
+	}
+	return min, max
 }

@@ -2,6 +2,7 @@ package cve
 
 import (
 	"fmt"
+	"reflect"
 	"testing"
 	"time"
 )
@@ -392,6 +393,145 @@ func TestValidateCve(t *testing.T) {
 	}
 }
 
+func TestValidateCves(t *testing.T) {
+	currentYear := time.Now().Year()
+	type args struct {
+		cveSlice []string
+	}
+	tests := []struct {
+		name string
+		args args
+		want []CveValidationResult
+	}{
+		{
+			name: "all valid CVEs",
+			args: args{
+				cveSlice: []string{"CVE-2022-1234", "CVE-2023-5678"},
+			},
+			want: []CveValidationResult{
+				{Cve: "CVE-2022-1234", Valid: true, Reason: ""},
+				{Cve: "CVE-2023-5678", Valid: true, Reason: ""},
+			},
+		},
+		{
+			name: "mixed valid and invalid",
+			args: args{
+				cveSlice: []string{"CVE-2022-1234", "not-a-cve", "CVE-1998-1234"},
+			},
+			want: []CveValidationResult{
+				{Cve: "CVE-2022-1234", Valid: true, Reason: ""},
+				{Cve: "not-a-cve", Valid: false, Reason: "invalid CVE format"},
+				{Cve: "CVE-1998-1234", Valid: false, Reason: "year 1998 is before 1999"},
+			},
+		},
+		{
+			name: "empty slice",
+			args: args{
+				cveSlice: []string{},
+			},
+			want: nil,
+		},
+		{
+			name: "future year invalid",
+			args: args{
+				cveSlice: []string{fmt.Sprintf("CVE-%d-1234", currentYear+5)},
+			},
+			want: []CveValidationResult{
+				{Cve: fmt.Sprintf("CVE-%d-1234", currentYear+5), Valid: false, Reason: fmt.Sprintf("year %d is after current year %d", currentYear+5, currentYear)},
+			},
+		},
+		{
+			name: "non-numeric sequence",
+			args: args{
+				cveSlice: []string{"CVE-2022-ABCD"},
+			},
+			want: []CveValidationResult{
+				{Cve: "CVE-2022-ABCD", Valid: false, Reason: "invalid CVE format"},
+			},
+		},
+		{
+			name: "zero sequence invalid",
+			args: args{
+				cveSlice: []string{"CVE-2022-0"},
+			},
+			want: []CveValidationResult{
+				{Cve: "CVE-2022-0", Valid: false, Reason: "sequence number must be positive"},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := ValidateCves(tt.args.cveSlice)
+			if len(got) == 0 && (tt.want == nil || len(tt.want) == 0) {
+				return
+			}
+			for i := range got {
+				if got[i].Cve != tt.want[i].Cve || got[i].Valid != tt.want[i].Valid || got[i].Reason != tt.want[i].Reason {
+					t.Errorf("ValidateCves()[%d] = %+v, want %+v", i, got[i], tt.want[i])
+				}
+			}
+		})
+	}
+}
+
+func TestFilterValidCves(t *testing.T) {
+	type args struct {
+		cveSlice []string
+	}
+	tests := []struct {
+		name string
+		args args
+		want []string
+	}{
+		{
+			name: "filter out invalid CVEs",
+			args: args{
+				cveSlice: []string{"CVE-2022-1234", "not-a-cve", "CVE-1998-1234", "CVE-2023-5678"},
+			},
+			want: []string{"CVE-2022-1234", "CVE-2023-5678"},
+		},
+		{
+			name: "all valid",
+			args: args{
+				cveSlice: []string{"CVE-2022-1234", "CVE-2023-5678"},
+			},
+			want: []string{"CVE-2022-1234", "CVE-2023-5678"},
+		},
+		{
+			name: "all invalid",
+			args: args{
+				cveSlice: []string{"not-a-cve", "also-not-cve"},
+			},
+			want: nil,
+		},
+		{
+			name: "empty slice",
+			args: args{
+				cveSlice: []string{},
+			},
+			want: nil,
+		},
+		{
+			name: "mixed case output formatted",
+			args: args{
+				cveSlice: []string{"cve-2022-1234", "CVE-2023-5678"},
+			},
+			want: []string{"CVE-2022-1234", "CVE-2023-5678"},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := FilterValidCves(tt.args.cveSlice)
+			if len(got) == 0 && (tt.want == nil || len(tt.want) == 0) {
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("FilterValidCves() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 // TestExtractYear 测试extractYear函数（直接测试内部函数以提高覆盖率）
 func TestExtractYear(t *testing.T) {
 	type args struct {
@@ -442,6 +582,74 @@ func TestExtractYear(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := extractYear(tt.args.cve); got != tt.want {
 				t.Errorf("extractYear() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestFormatSeq(t *testing.T) {
+	type args struct {
+		cve   string
+		width int
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{
+			name: "pad to 6 digits",
+			args: args{
+				cve:   "CVE-2022-123",
+				width: 6,
+			},
+			want: "CVE-2022-000123",
+		},
+		{
+			name: "pad to 5 digits",
+			args: args{
+				cve:   "CVE-2022-12345",
+				width: 6,
+			},
+			want: "CVE-2022-012345",
+		},
+		{
+			name: "already at target width",
+			args: args{
+				cve:   "CVE-2022-123456",
+				width: 6,
+			},
+			want: "CVE-2022-123456",
+		},
+		{
+			name: "wider than target",
+			args: args{
+				cve:   "CVE-2022-1234567",
+				width: 6,
+			},
+			want: "CVE-2022-1234567",
+		},
+		{
+			name: "invalid CVE returns as-is",
+			args: args{
+				cve:   "not-a-cve",
+				width: 6,
+			},
+			want: "not-a-cve",
+		},
+		{
+			name: "case insensitive input",
+			args: args{
+				cve:   "cve-2022-123",
+				width: 6,
+			},
+			want: "CVE-2022-000123",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := FormatSeq(tt.args.cve, tt.args.width); got != tt.want {
+				t.Errorf("FormatSeq() = %v, want %v", got, tt.want)
 			}
 		})
 	}

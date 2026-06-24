@@ -32,6 +32,10 @@ CVE (Common Vulnerabilities and Exposures) 相关的工具方法集合。这个�
   - [比较与排序](#比较与排序)
   - [过滤与分组](#过滤与分组)
   - [生成与构造](#生成与构造)
+  - [集合运算](#集合运算)
+  - [批量验证](#批量验证)
+  - [范围与模式匹配](#范围与模式匹配)
+  - [统计分析](#统计分析)
 - [使用场景示例](#-使用场景示例)
 - [项目结构](#-项目结构)
 - [参考资料](#-参考资料)
@@ -45,6 +49,12 @@ CVE (Common Vulnerabilities and Exposures) 相关的工具方法集合。这个�
 - ✅ CVE 的排序、过滤和分组
 - ✅ 生成标准格式的 CVE 标识符
 - ✅ 去重和验证工具
+- ✅ 集合运算（交集、并集、差集）
+- ✅ 批量验证及详细错误报告
+- ✅ CVE 范围解析（支持 `to`、`..`、`-` 语法）
+- ✅ 统计分析（按年计数、年份范围、序列号范围）
+- ✅ 通配符模式匹配实现灵活筛选
+- ✅ 序列号格式化（前补零）
 
 ## 📦 安装
 
@@ -119,6 +129,39 @@ func main() {
 | 函数 | 描述 |
 |------|------|
 | `GenerateCve(year int, seq int) string` | 根据年份和序列号生成 CVE |
+| `GenerateFakeCve() string` | 生成一个随机的假 CVE 测试用 |
+| `FormatSeq(cve string, width int) string` | 将 CVE 序列号格式化为指定位数（前补零） |
+
+### 集合运算
+
+| 函数 | 描述 |
+|------|------|
+| `IntersectCves(a, b []string) []string` | 求两个 CVE 列表的交集 |
+| `UnionCves(a, b []string) []string` | 求两个 CVE 列表的并集 |
+| `DiffCves(a, b []string) []string` | 求两个 CVE 列表的差集（a 有 b 无） |
+
+### 批量验证
+
+| 函数 | 描述 |
+|------|------|
+| `ValidateCves(cveSlice []string) []CveValidationResult` | 批量验证 CVE 并返回详细错误原因 |
+| `FilterValidCves(cveSlice []string) []string` | 从列表中过滤出有效的 CVE |
+
+### 范围与模式匹配
+
+| 函数 | 描述 |
+|------|------|
+| `ParseCveRange(rangeExpr string) []string` | 解析 CVE 范围表达式（支持 `to`、`..`、`-`） |
+| `IsCvesConsecutive(a, b string) bool` | 判断两个 CVE 是否连续 |
+| `FilterCvesByPattern(cveSlice []string, pattern string) []string` | 通过通配符模式筛选 CVE（如 `CVE-2022-*`） |
+
+### 统计分析
+
+| 函数 | 描述 |
+|------|------|
+| `CountByYear(cveSlice []string) map[int]int` | 按年份统计 CVE 数量 |
+| `YearRange(cveSlice []string) (min, max int)` | 获取 CVE 列表中最早和最晚的年份 |
+| `SeqRange(cveSlice []string, year int) (min, max int)` | 获取指定年份下 CVE 序列号的范围 |
 
 ## 💡 使用场景示例
 
@@ -154,12 +197,16 @@ func cleanCveList(rawList []string) []string {
 
 ```
 cve/
-├── cve.go              # 主要功能实现
-├── cve_test.go         # 单元测试
-├── README.md           # 英文文档
-├── README.zh.md        # 中文文档
-├── LICENSE             # 许可证
-└── docs/               # 文档网站
+├── base.go              # 格式化、验证、批量验证
+├── extract.go           # 提取方法、模式匹配
+├── compare.go           # 比较与排序
+├── filter.go            # 过滤分组、集合运算、统计分析
+├── generate.go          # 生成构造、范围解析
+├── *_test.go            # 单元测试（覆盖率 95%+）
+├── README.md            # 英文文档
+├── README.zh.md         # 中文文档
+├── LICENSE              # 许可证
+└── docs/                # 文档网站
     ├── index.md        # 英文首页
     ├── zh/             # 中文文档
     ├── api/            # API 文档

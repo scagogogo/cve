@@ -1,6 +1,7 @@
 package cve
 
 import (
+	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
@@ -43,6 +44,48 @@ var (
 //	// standardCve 为 "CVE-2022-12345"
 func Format(cve string) string {
 	return strings.ToUpper(strings.TrimSpace(cve))
+}
+
+// FormatSeq 格式化CVE的序列号为固定宽度（前补零）
+//
+// 提取CVE的序列号并格式化为指定位数的字符串，不足位数前面补零
+//
+// 参数:
+//   - cve: CVE编号字符串
+//   - width: 目标宽度，序列号不足时前面补零，如width=6则"123"变为"000123"
+//
+// 返回值:
+//   - string: 序列号为指定位数的CVE编号，如果格式无效则返回原始输入
+//
+// 示例:
+//
+//	输入: "CVE-2022-123", 6
+//	输出: "CVE-2022-000123"
+//
+//	输入: "CVE-2022-12345", 6
+//	输出: "CVE-2022-012345"
+//
+//	输入: "not-a-cve", 6
+//	输出: "not-a-cve" (无效输入直接返回)
+//
+// 使用场景:
+//   - 统一CVE显示格式
+//   - 数据库存储时保证CVE编号的序列号长度一致
+//
+// 代码示例:
+//
+//	standardized := cve.FormatSeq("CVE-2022-123", 6)
+//	// standardized 为 "CVE-2022-000123"
+func FormatSeq(cve string, width int) string {
+	if !IsCve(cve) {
+		return cve
+	}
+	year, seq := Split(cve)
+	seqInt, err := strconv.Atoi(seq)
+	if err != nil {
+		return cve
+	}
+	return fmt.Sprintf("CVE-%s-%0*d", year, width, seqInt)
 }
 
 // IsCve 判断字符串是否是有效的CVE格式
@@ -226,6 +269,142 @@ func Split(cve string) (year string, seq string) {
 		return
 	}
 	return split[1], split[2]
+}
+
+// CveValidationResult 表示单个CVE的验证结果
+//
+// 包含验证状态和失败原因
+type CveValidationResult struct {
+	Cve    string // 原始CVE编号
+	Valid  bool   // 是否有效
+	Reason string // 无效原因，有效时为空字符串
+}
+
+// ValidateCves 批量验证CVE编号
+//
+// 对CVE列表进行逐个验证，返回每个CVE的验证结果
+//
+// 参数:
+//   - cveSlice: 需要验证的CVE编号数组
+//
+// 返回值:
+//   - []CveValidationResult: 每个CVE的验证结果，包含有效性和失败原因
+//
+// 验证规则:
+//  1. 格式必须为"CVE-YYYY-NNNNN"（大小写不敏感）
+//  2. 年份必须在1999至当前年份之间
+//  3. 序列号必须为正整数
+//
+// 示例:
+//
+//	输入: ["CVE-2022-12345", "CVE-1998-12345", "not-a-cve"]
+//	输出: [
+//	  {Cve: "CVE-2022-12345", Valid: true, Reason: ""},
+//	  {Cve: "CVE-1998-12345", Valid: false, Reason: "year 1998 is before 1999"},
+//	  {Cve: "not-a-cve", Valid: false, Reason: "invalid CVE format"},
+//	]
+//
+// 使用场景:
+//   - 批量导入CVE数据前的质量检查
+//   - 生成数据质量报告
+//
+// 代码示例:
+//
+//	results := cve.ValidateCves([]string{"CVE-2022-12345", "invalid"})
+//	for _, r := range results {
+//	    if !r.Valid {
+//	        fmt.Printf("Invalid CVE %s: %s\n", r.Cve, r.Reason)
+//	    }
+//	}
+func ValidateCves(cveSlice []string) []CveValidationResult {
+	results := make([]CveValidationResult, len(cveSlice))
+	for i, cve := range cveSlice {
+		results[i] = validateSingleCve(cve)
+	}
+	return results
+}
+
+// validateSingleCve 验证单个CVE并返回详细结果
+func validateSingleCve(cve string) CveValidationResult {
+	result := CveValidationResult{Cve: cve}
+
+	if !IsCve(cve) {
+		result.Valid = false
+		result.Reason = "invalid CVE format"
+		return result
+	}
+
+	year, seq := Split(cve)
+	yearInt, yearErr := strconv.Atoi(year)
+	seqInt, seqErr := strconv.Atoi(seq)
+
+	if yearErr != nil {
+		result.Valid = false
+		result.Reason = "year is not a valid number"
+		return result
+	}
+
+	if seqErr != nil {
+		result.Valid = false
+		result.Reason = "sequence number is not a valid number"
+		return result
+	}
+
+	if yearInt < 1999 {
+		result.Valid = false
+		result.Reason = fmt.Sprintf("year %d is before 1999", yearInt)
+		return result
+	}
+
+	currentYear := time.Now().Year()
+	if yearInt > currentYear {
+		result.Valid = false
+		result.Reason = fmt.Sprintf("year %d is after current year %d", yearInt, currentYear)
+		return result
+	}
+
+	if seqInt <= 0 {
+		result.Valid = false
+		result.Reason = "sequence number must be positive"
+		return result
+	}
+
+	result.Valid = true
+	return result
+}
+
+// FilterValidCves 从CVE列表中过滤出有效的CVE编号
+//
+// 只保留格式正确且年份和序列号均有效的CVE编号
+//
+// 参数:
+//   - cveSlice: 需要过滤的CVE编号数组
+//
+// 返回值:
+//   - []string: 所有有效的CVE编号，已格式化为大写
+//
+// 示例:
+//
+//	输入: ["CVE-2022-12345", "not-a-cve", "CVE-1998-12345", "CVE-2023-99999"]
+//	输出: ["CVE-2022-12345", "CVE-2023-99999"] (假设当前年份为2024)
+//
+// 使用场景:
+//   - 数据清洗：从混合数据中提取有效的CVE
+//   - 导入前预处理
+//
+// 代码示例:
+//
+//	raw := []string{"CVE-2022-12345", "invalid", "cve-2023-54321"}
+//	valid := cve.FilterValidCves(raw)
+//	// valid 为 ["CVE-2022-12345", "CVE-2023-54321"]
+func FilterValidCves(cveSlice []string) []string {
+	var result []string
+	for _, cve := range cveSlice {
+		if ValidateCve(cve) {
+			result = append(result, Format(cve))
+		}
+	}
+	return result
 }
 
 // ValidateCve 全面验证CVE编号的合法性

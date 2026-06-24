@@ -298,3 +298,83 @@ func TestExtractCveSeqAsInt(t *testing.T) {
 		})
 	}
 }
+
+func TestFilterCvesByPattern(t *testing.T) {
+	type args struct {
+		cveSlice []string
+		pattern  string
+	}
+	tests := []struct {
+		name string
+		args args
+		want []string
+	}{
+		{
+			name: "filter by year wildcard",
+			args: args{
+				cveSlice: []string{"CVE-2022-1111", "CVE-2022-2222", "CVE-2023-1111", "CVE-2023-2222"},
+				pattern:  "CVE-2022-*",
+			},
+			want: []string{"CVE-2022-1111", "CVE-2022-2222"},
+		},
+		{
+			name: "filter by sequence wildcard",
+			args: args{
+				cveSlice: []string{"CVE-2022-1111", "CVE-2021-1111", "CVE-2023-2222"},
+				pattern:  "CVE-*-1111",
+			},
+			want: []string{"CVE-2021-1111", "CVE-2022-1111"},
+		},
+		{
+			name: "filter by prefix pattern",
+			args: args{
+				cveSlice: []string{"CVE-2022-1111", "CVE-2022-1122", "CVE-2022-2222"},
+				pattern:  "CVE-2022-11*",
+			},
+			want: []string{"CVE-2022-1111", "CVE-2022-1122"},
+		},
+		{
+			name: "exact match (no wildcard)",
+			args: args{
+				cveSlice: []string{"CVE-2022-1111", "CVE-2022-2222"},
+				pattern:  "CVE-2022-1111",
+			},
+			want: []string{"CVE-2022-1111"},
+		},
+		{
+			name: "no matches",
+			args: args{
+				cveSlice: []string{"CVE-2022-1111", "CVE-2022-2222"},
+				pattern:  "CVE-2023-*",
+			},
+			want: nil,
+		},
+		{
+			name: "case insensitive pattern",
+			args: args{
+				cveSlice: []string{"CVE-2022-1111", "CVE-2022-2222"},
+				pattern:  "cve-2022-*",
+			},
+			want: []string{"CVE-2022-1111", "CVE-2022-2222"},
+		},
+		{
+			name: "empty slice",
+			args: args{
+				cveSlice: []string{},
+				pattern:  "CVE-2022-*",
+			},
+			want: nil,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := FilterCvesByPattern(tt.args.cveSlice, tt.args.pattern)
+			if len(got) == 0 && (tt.want == nil || len(tt.want) == 0) {
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("FilterCvesByPattern() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

@@ -62,6 +62,11 @@ CVE Utils 提供了一套完整的 CVE 处理函数，涵盖了从基本的格�
 |------|------|
 | `GenerateCve(year int, seq int) string` | 根据年份和序列号生成 CVE |
 
+- **集合运算**: 计算 CVE 列表的交集、并集和差集 — [查看文档](/zh/api/set-operations)
+- **批量验证**: 批量验证 CVE 并返回详细的错误报告 — [查看文档](/zh/api/batch-validation)
+- **范围与模式**: 解析 CVE 范围表达式，通配符模式筛选 — [查看文档](/zh/api/range-pattern)
+- **统计分析**: 按年份计数，获取年份和序列号范围 — [查看文档](/zh/api/statistics)
+
 ## 快速参考
 
 ### 常用操作

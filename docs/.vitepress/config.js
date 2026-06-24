@@ -39,7 +39,11 @@ export default defineConfig({
                 { text: 'Extraction Methods', link: '/api/extract' },
                 { text: 'Comparison & Sorting', link: '/api/compare-sort' },
                 { text: 'Filtering & Grouping', link: '/api/filter-group' },
-                { text: 'Generation & Construction', link: '/api/generate' }
+                { text: 'Generation & Construction', link: '/api/generate' },
+                { text: 'Set Operations', link: '/api/set-operations' },
+                { text: 'Batch Validation', link: '/api/batch-validation' },
+                { text: 'Range & Pattern', link: '/api/range-pattern' },
+                { text: 'Statistical Analysis', link: '/api/statistics' }
               ]
             }
           ],
@@ -94,7 +98,11 @@ export default defineConfig({
                 { text: '提取方法', link: '/zh/api/extract' },
                 { text: '比较与排序', link: '/zh/api/compare-sort' },
                 { text: '过滤与分组', link: '/zh/api/filter-group' },
-                { text: '生成与构造', link: '/zh/api/generate' }
+                { text: '生成与构造', link: '/zh/api/generate' },
+                { text: '集合运算', link: '/zh/api/set-operations' },
+                { text: '批量验证', link: '/zh/api/batch-validation' },
+                { text: '范围与模式', link: '/zh/api/range-pattern' },
+                { text: '统计分析', link: '/zh/api/statistics' }
               ]
             }
           ],

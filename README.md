@@ -32,6 +32,10 @@ Documentation includes:
   - [Comparison & Sorting](#comparison--sorting)
   - [Filtering & Grouping](#filtering--grouping)
   - [Generation & Construction](#generation--construction)
+  - [Set Operations](#set-operations)
+  - [Batch Validation](#batch-validation)
+  - [Range & Pattern Matching](#range--pattern-matching)
+  - [Statistical Analysis](#statistical-analysis)
 - [Usage Examples](#-usage-examples)
 - [Project Structure](#-project-structure)
 - [References](#-references)
@@ -45,6 +49,12 @@ Documentation includes:
 - ✅ Sort, filter, and group CVEs
 - ✅ Generate standard format CVE identifiers
 - ✅ Deduplication and validation tools
+- ✅ Set operations (intersection, union, difference)
+- ✅ Batch validation with detailed error reporting
+- ✅ CVE range parsing (supports `to`, `..`, `-` syntax)
+- ✅ Statistical analysis (count by year, year range, sequence range)
+- ✅ Wildcard pattern matching for flexible filtering
+- ✅ Sequence number formatting (zero-padding)
 
 ## 📦 Installation
 
@@ -119,6 +129,39 @@ func main() {
 | Function | Description |
 |----------|-------------|
 | `GenerateCve(year int, seq int) string` | Generate CVE from year and sequence |
+| `GenerateFakeCve() string` | Generate a random fake CVE for testing |
+| `FormatSeq(cve string, width int) string` | Format CVE sequence number to fixed width with zero-padding |
+
+### Set Operations
+
+| Function | Description |
+|----------|-------------|
+| `IntersectCves(a, b []string) []string` | Compute intersection of two CVE lists |
+| `UnionCves(a, b []string) []string` | Compute union of two CVE lists |
+| `DiffCves(a, b []string) []string` | Compute difference (a - b) of two CVE lists |
+
+### Batch Validation
+
+| Function | Description |
+|----------|-------------|
+| `ValidateCves(cveSlice []string) []CveValidationResult` | Batch validate CVEs with detailed error reasons |
+| `FilterValidCves(cveSlice []string) []string` | Filter out only valid CVEs from a list |
+
+### Range & Pattern Matching
+
+| Function | Description |
+|----------|-------------|
+| `ParseCveRange(rangeExpr string) []string` | Parse CVE range expression (supports `to`, `..`, `-`) |
+| `IsCvesConsecutive(a, b string) bool` | Check if two CVEs are consecutive |
+| `FilterCvesByPattern(cveSlice []string, pattern string) []string` | Filter CVEs by wildcard pattern (e.g., `CVE-2022-*`) |
+
+### Statistical Analysis
+
+| Function | Description |
+|----------|-------------|
+| `CountByYear(cveSlice []string) map[int]int` | Count CVEs by year |
+| `YearRange(cveSlice []string) (min, max int)` | Get the earliest and latest year of CVEs |
+| `SeqRange(cveSlice []string, year int) (min, max int)` | Get sequence number range for a given year |
 
 ## 💡 Usage Examples
 
@@ -154,12 +197,16 @@ func cleanCveList(rawList []string) []string {
 
 ```
 cve/
-├── cve.go              # Main functionality
-├── cve_test.go         # Unit tests
-├── README.md           # English documentation
-├── README.zh.md        # Chinese documentation
-├── LICENSE             # License file
-└── docs/               # Documentation website
+├── base.go              # Format, validation, batch validation
+├── extract.go           # Extraction, pattern matching
+├── compare.go           # Comparison and sorting
+├── filter.go            # Filtering, grouping, set operations, statistics
+├── generate.go          # Generation, range parsing
+├── *_test.go            # Unit tests (95%+ coverage)
+├── README.md            # English documentation
+├── README.zh.md         # Chinese documentation
+├── LICENSE              # License file
+└── docs/                # Documentation website
     ├── index.md        # English homepage
     ├── zh/             # Chinese documentation
     ├── api/            # API documentation
