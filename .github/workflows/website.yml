@@ -1,0 +1,108 @@
+name: Deploy Website
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'website/**'
+      - 'docs/**'
+      - 'scripts/**'
+      - '.github/workflows/website.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'website/**'
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # === Build VitePress docs ===
+      - name: Install docs dependencies
+        run: |
+          cd docs
+          npm ci
+
+      - name: Build VitePress docs
+        run: |
+          cd docs
+          npm run docs:build
+
+      # === Generate diagrams ===
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Python dependencies
+        run: pip install matplotlib numpy
+
+      - name: Generate diagrams
+        run: |
+          python3 scripts/gen_architecture.py
+          python3 scripts/gen_feature_map.py
+          python3 scripts/gen_cli_tree.py
+
+      # === Build React website ===
+      - name: Install website dependencies
+        run: |
+          cd website
+          npm ci
+
+      - name: Copy diagrams to website public
+        run: |
+          mkdir -p website/public/images
+          cp docs/images/*.png website/public/images/
+
+      - name: Build React website
+        run: |
+          cd website
+          npm run build
+
+      # === Merge: put VitePress docs under /docs path ===
+      - name: Merge docs into website
+        run: |
+          mkdir -p website/dist/docs
+          cp -r docs/.vitepress/dist/* website/dist/docs/
+
+      # === Upload artifact ===
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+        with:
+          enablement: true
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: website/dist
+
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

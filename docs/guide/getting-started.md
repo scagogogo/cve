@@ -7,7 +7,7 @@ Welcome to CVE Utils! This guide will help you quickly get started with this pow
 Install using go get:
 
 ```bash
-go get github.com/scagogogo/cve
+go get github.com/scagogogo/cve-skills
 ```
 
 ## Verify Installation
@@ -19,7 +19,7 @@ package main
 
 import (
     "fmt"
-    "github.com/scagogogo/cve"
+    "github.com/scagogogo/cve-skills"
 )
 
 func main() {

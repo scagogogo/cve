@@ -14,7 +14,7 @@ This page provides detailed instructions on how to install and configure CVE Uti
 This is the simplest and recommended installation method:
 
 ```bash
-go get github.com/scagogogo/cve
+go get github.com/scagogogo/cve-skills
 ```
 
 ### Method 2: Using go mod
@@ -28,12 +28,12 @@ go mod init your-project-name
 
 2. Add CVE Utils as a dependency:
 ```bash
-go get github.com/scagogogo/cve
+go get github.com/scagogogo/cve-skills
 ```
 
 3. Import in your Go code:
 ```go
-import "github.com/scagogogo/cve"
+import "github.com/scagogogo/cve-skills"
 ```
 
 ## Verification
@@ -45,7 +45,7 @@ package main
 
 import (
     "fmt"
-    "github.com/scagogogo/cve"
+    "github.com/scagogogo/cve-skills"
 )
 
 func main() {
@@ -65,13 +65,13 @@ func main() {
 
 1. **Go version too old**: Ensure you are using Go 1.18 or higher
 2. **Module not found**: Make sure you have internet access and can reach GitHub
-3. **Import errors**: Verify the import path is correct: `github.com/scagogogo/cve`
+3. **Import errors**: Verify the import path is correct: `github.com/scagogogo/cve-skills`
 
 ### Getting Help
 
 If you encounter issues:
-1. Check the [GitHub Issues](https://github.com/scagogogo/cve/issues)
-2. Review the [documentation](https://scagogogo.github.io/cve/)
+1. Check the [GitHub Issues](https://github.com/scagogogo/cve-skills/issues)
+2. Review the [documentation](https://scagogogo.github.io/cve-skills/)
 3. Create a new issue if needed
 
 ## Next Steps

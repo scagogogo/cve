@@ -7,7 +7,7 @@
 首先在您的 Go 代码中导入 CVE Utils：
 
 ```go
-import "github.com/scagogogo/cve"
+import "github.com/scagogogo/cve-skills"
 ```
 
 ## 核心概念
@@ -46,7 +46,7 @@ package main
 
 import (
     "fmt"
-    "github.com/scagogogo/cve"
+    "github.com/scagogogo/cve-skills"
 )
 
 func main() {

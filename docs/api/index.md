@@ -72,7 +72,7 @@ Functions for generating new CVE identifiers:
 ### Common Operations
 
 ```go
-import "github.com/scagogogo/cve"
+import "github.com/scagogogo/cve-skills"
 
 // Format
 formatted := cve.Format(" cve-2022-12345 ")  // "CVE-2022-12345"

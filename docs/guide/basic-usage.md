@@ -7,7 +7,7 @@ This guide provides detailed instructions on the basic usage methods and best pr
 First, import CVE Utils in your Go code:
 
 ```go
-import "github.com/scagogogo/cve"
+import "github.com/scagogogo/cve-skills"
 ```
 
 ## Core Concepts
@@ -39,7 +39,7 @@ package main
 
 import (
     "fmt"
-    "github.com/scagogogo/cve"
+    "github.com/scagogogo/cve-skills"
 )
 
 func main() {

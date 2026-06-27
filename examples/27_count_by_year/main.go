@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/scagogogo/cve"
+	"github.com/scagogogo/cve-skills"
 )
 
 func main() {

@@ -14,7 +14,7 @@ hero:
       link: /api/
     - theme: alt
       text: View on GitHub
-      link: https://github.com/scagogogo/cve
+      link: https://github.com/scagogogo/cve-skills
 
 features:
   - icon: 🔍
@@ -42,7 +42,7 @@ features:
 ### Installation
 
 ```bash
-go get github.com/scagogogo/cve
+go get github.com/scagogogo/cve-skills
 ```
 
 ### Basic Usage
@@ -52,7 +52,7 @@ package main
 
 import (
     "fmt"
-    "github.com/scagogogo/cve"
+    "github.com/scagogogo/cve-skills"
 )
 
 func main() {

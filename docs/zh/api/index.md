@@ -72,7 +72,7 @@ CVE Utils 提供了一套完整的 CVE 处理函数，涵盖了从基本的格�
 ### 常用操作
 
 ```go
-import "github.com/scagogogo/cve"
+import "github.com/scagogogo/cve-skills"
 
 // 格式化
 formatted := cve.Format(" cve-2022-12345 ")  // "CVE-2022-12345"

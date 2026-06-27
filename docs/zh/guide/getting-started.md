@@ -7,7 +7,7 @@
 ### 使用 go get 安装
 
 ```bash
-go get github.com/scagogogo/cve
+go get github.com/scagogogo/cve-skills
 ```
 
 ### 验证安装
@@ -20,7 +20,7 @@ package main
 
 import (
     "fmt"
-    "github.com/scagogogo/cve"
+    "github.com/scagogogo/cve-skills"
 )
 
 func main() {
@@ -77,7 +77,7 @@ package main
 
 import (
     "fmt"
-    "github.com/scagogogo/cve"
+    "github.com/scagogogo/cve-skills"
 )
 
 func main() {
@@ -235,4 +235,4 @@ func performanceExample() {
 2. 浏览 [使用示例](/examples/) 学习更多实际应用场景
 3. 查看 [基本使用指南](/guide/basic-usage) 了解更多细节
 
-如果遇到问题，请查看 [GitHub Issues](https://github.com/scagogogo/cve/issues) 或提交新的问题。
+如果遇到问题，请查看 [GitHub Issues](https://github.com/scagogogo/cve-skills/issues) 或提交新的问题。

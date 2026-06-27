@@ -3,7 +3,7 @@ package cmd
 import (
 	"fmt"
 
-	cvepkg "github.com/scagogogo/cve"
+	cvepkg "github.com/scagogogo/cve-skills"
 	"github.com/spf13/cobra"
 )
 

@@ -1,0 +1,384 @@
+/* ===== Global ===== */
+.site-layout {
+  min-height: 100vh;
+  background: #fafbfc;
+}
+
+/* ===== Header ===== */
+.site-header {
+  background: white !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  padding: 0 40px !important;
+}
+
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  font-size: 20px;
+  font-weight: 700;
+  color: #2d3436;
+}
+
+.logo-text {
+  background: linear-gradient(135deg, #e94560, #ff6b6b);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.nav-link {
+  color: #636e72 !important;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.nav-link:hover {
+  color: #e94560 !important;
+}
+
+/* ===== Hero Section ===== */
+.hero-section {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  padding: 100px 40px 80px;
+  text-align: center;
+}
+
+.hero-content {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.hero-badge {
+  margin-bottom: 24px;
+}
+
+.hero-badge .ant-tag {
+  font-size: 14px;
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+.hero-title {
+  color: white !important;
+  font-size: 48px !important;
+  line-height: 1.2 !important;
+  margin-bottom: 24px !important;
+}
+
+.highlight {
+  background: linear-gradient(135deg, #e94560, #ff6b6b);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-desc {
+  color: #b2bec3 !important;
+  font-size: 18px !important;
+  line-height: 1.8 !important;
+  margin-bottom: 36px !important;
+}
+
+.hero-actions {
+  margin-bottom: 48px;
+}
+
+.hero-stats {
+  display: flex;
+  justify-content: center;
+  gap: 48px;
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-number {
+  display: block;
+  font-size: 32px;
+  font-weight: 700;
+  color: #e94560;
+}
+
+.stat-label {
+  display: block;
+  font-size: 14px;
+  color: #b2bec3;
+  margin-top: 4px;
+}
+
+/* ===== Section common ===== */
+.section-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 80px 40px;
+}
+
+.section-title {
+  text-align: center;
+  margin-bottom: 16px !important;
+}
+
+.section-subtitle {
+  text-align: center;
+  color: #636e72 !important;
+  font-size: 16px !important;
+  margin-bottom: 48px !important;
+}
+
+.sub-title {
+  text-align: center;
+  color: #2d3436;
+}
+
+/* ===== Problem Section ===== */
+.problem-section {
+  background: white;
+}
+
+.problem-card {
+  height: 100%;
+  border-radius: 12px;
+  border-color: #ff6b6b33;
+}
+
+.problem-card h4 {
+  color: #d63031 !important;
+}
+
+.solution-card {
+  height: 100%;
+  border-radius: 12px;
+  border-color: #00b89433;
+}
+
+.solution-card h4 {
+  color: #00b894 !important;
+}
+
+.problem-list {
+  list-style: none;
+  padding: 0;
+}
+
+.problem-list li {
+  padding: 8px 0;
+  font-size: 15px;
+  line-height: 1.6;
+  color: #2d3436;
+}
+
+.problem-list code {
+  background: #f1f2f6;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+/* ===== Feature Section ===== */
+.feature-section {
+  background: #fafbfc;
+}
+
+.feature-card {
+  height: 100%;
+  border-radius: 12px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.feature-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+}
+
+.feature-icon {
+  margin-bottom: 16px;
+}
+
+.feature-desc {
+  color: #636e72 !important;
+  min-height: 44px;
+}
+
+.feature-tags {
+  margin-top: 12px;
+}
+
+.feature-tag {
+  font-family: 'SF Mono', 'Monaco', 'Menlo', monospace;
+  font-size: 12px;
+}
+
+/* ===== Architecture Section ===== */
+.architecture-section {
+  background: white;
+}
+
+.image-container {
+  text-align: center;
+  background: #fafbfc;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.diagram-img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+/* ===== CLI Section ===== */
+.cli-section {
+  background: #1a1a2e;
+}
+
+.cli-section .section-title {
+  color: white !important;
+}
+
+.cli-section .section-subtitle {
+  color: #b2bec3 !important;
+}
+
+.cli-card {
+  border-radius: 12px;
+  background: #16213e !important;
+  border-color: #2d3436;
+}
+
+.cli-card .ant-tabs-tab {
+  color: #b2bec3 !important;
+}
+
+.cli-card .ant-tabs-tab-active .ant-tabs-tab-btn {
+  color: #e94560 !important;
+}
+
+.cli-card .ant-tabs-ink-bar {
+  background: #e94560 !important;
+}
+
+.install-block,
+.code-block {
+  background: #0f3460 !important;
+  color: #dfe6e9 !important;
+  padding: 20px !important;
+  border-radius: 8px;
+  font-family: 'SF Mono', 'Monaco', 'Menlo', monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  overflow-x: auto;
+  border: 1px solid #2d3436;
+  margin: 0 !important;
+}
+
+.cli-tabs .ant-tabs-content {
+  color: #dfe6e9;
+}
+
+/* ===== Quick Start Section ===== */
+.quickstart-section {
+  background: #fafbfc;
+}
+
+.install-card,
+.code-card {
+  height: 100%;
+  border-radius: 12px;
+}
+
+.code-block {
+  white-space: pre;
+  tab-size: 4;
+}
+
+/* ===== Links Section ===== */
+.links-section {
+  background: white;
+}
+
+.link-card {
+  text-align: center;
+  border-radius: 12px;
+  transition: transform 0.2s;
+}
+
+.link-card:hover {
+  transform: translateY(-4px);
+}
+
+/* ===== Footer ===== */
+.site-footer {
+  background: #1a1a2e !important;
+  text-align: center;
+  padding: 40px !important;
+}
+
+.footer-content {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.site-footer .ant-divider {
+  border-color: #2d3436;
+}
+
+.site-footer p {
+  color: #b2bec3 !important;
+}
+
+.footer-link {
+  color: #b2bec3 !important;
+  transition: color 0.2s;
+}
+
+.footer-link:hover {
+  color: #e94560 !important;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 32px !important;
+  }
+
+  .hero-desc {
+    font-size: 15px !important;
+  }
+
+  .hero-stats {
+    gap: 24px;
+  }
+
+  .stat-number {
+    font-size: 24px;
+  }
+
+  .section-inner {
+    padding: 48px 20px;
+  }
+
+  .site-header {
+    padding: 0 16px !important;
+  }
+
+  .header-inner {
+    flex-direction: column;
+    height: auto;
+    padding: 12px 0;
+    gap: 12px;
+  }
+}

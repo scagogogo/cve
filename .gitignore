@@ -28,3 +28,7 @@ go.work
 docs/node_modules/
 docs/.vitepress/dist/
 docs/.vitepress/cache/
+
+# Website dependencies and build output
+website/node_modules/
+website/dist/

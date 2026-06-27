@@ -14,7 +14,7 @@
 这是最简单和推荐的安装方法：
 
 ```bash
-go get github.com/scagogogo/cve
+go get github.com/scagogogo/cve-skills
 ```
 
 ### 方法二：使用 go mod
@@ -22,7 +22,7 @@ go get github.com/scagogogo/cve
 如果您使用 Go modules，可以在项目中直接导入：
 
 ```go
-import "github.com/scagogogo/cve"
+import "github.com/scagogogo/cve-skills"
 ```
 
 然后运行：
@@ -36,7 +36,7 @@ go mod tidy
 您也可以手动克隆仓库：
 
 ```bash
-git clone https://github.com/scagogogo/cve.git
+git clone https://github.com/scagogogo/cve-skills.git
 cd cve
 go build
 ```
@@ -53,7 +53,7 @@ package main
 
 import (
     "fmt"
-    "github.com/scagogogo/cve"
+    "github.com/scagogogo/cve-skills"
 )
 
 func main() {
@@ -102,7 +102,7 @@ go run verify.go
 
 ```bash
 # 克隆仓库（如果还没有）
-git clone https://github.com/scagogogo/cve.git
+git clone https://github.com/scagogogo/cve-skills.git
 cd cve
 
 # 运行所有测试
@@ -127,7 +127,7 @@ cd my-cve-project
 go mod init my-cve-project
 
 # 添加 CVE Utils 依赖
-go get github.com/scagogogo/cve
+go get github.com/scagogogo/cve-skills
 
 # 创建主文件
 cat > main.go << 'EOF'
@@ -135,7 +135,7 @@ package main
 
 import (
     "fmt"
-    "github.com/scagogogo/cve"
+    "github.com/scagogogo/cve-skills"
 )
 
 func main() {
@@ -154,7 +154,7 @@ go run main.go
 
 ```bash
 # 在项目根目录下
-go get github.com/scagogogo/cve
+go get github.com/scagogogo/cve-skills
 
 # 更新依赖
 go mod tidy
@@ -163,7 +163,7 @@ go mod tidy
 然后在代码中导入：
 
 ```go
-import "github.com/scagogogo/cve"
+import "github.com/scagogogo/cve-skills"
 ```
 
 ## 版本管理
@@ -174,22 +174,22 @@ import "github.com/scagogogo/cve"
 
 ```bash
 # 使用特定标签版本
-go get github.com/scagogogo/cve@v1.0.0
+go get github.com/scagogogo/cve-skills@v1.0.0
 
 # 使用特定提交
-go get github.com/scagogogo/cve@commit-hash
+go get github.com/scagogogo/cve-skills@commit-hash
 ```
 
 ### 查看当前版本
 
 ```bash
-go list -m github.com/scagogogo/cve
+go list -m github.com/scagogogo/cve-skills
 ```
 
 ### 更新到最新版本
 
 ```bash
-go get -u github.com/scagogogo/cve
+go get -u github.com/scagogogo/cve-skills
 go mod tidy
 ```
 
@@ -199,7 +199,7 @@ go mod tidy
 
 **错误信息**：
 ```
-go: module github.com/scagogogo/cve requires go >= 1.18
+go: module github.com/scagogogo/cve-skills requires go >= 1.18
 ```
 
 **解决方案**：
@@ -209,7 +209,7 @@ go: module github.com/scagogogo/cve requires go >= 1.18
 
 **错误信息**：
 ```
-go: github.com/scagogogo/cve: dial tcp: lookup github.com: no such host
+go: github.com/scagogogo/cve-skills: dial tcp: lookup github.com: no such host
 ```
 
 **解决方案**：
@@ -225,7 +225,7 @@ go env -w GOSUMDB=sum.golang.google.cn
 
 **错误信息**：
 ```
-go: github.com/scagogogo/cve@v1.0.0: invalid version: unknown revision
+go: github.com/scagogogo/cve-skills@v1.0.0: invalid version: unknown revision
 ```
 
 **解决方案**：
@@ -233,14 +233,14 @@ go: github.com/scagogogo/cve@v1.0.0: invalid version: unknown revision
 
 ```bash
 go clean -modcache
-go get github.com/scagogogo/cve
+go get github.com/scagogogo/cve-skills
 ```
 
 ### 问题 4：导入路径错误
 
 **错误信息**：
 ```
-package github.com/scagogogo/cve is not in GOROOT
+package github.com/scagogogo/cve-skills is not in GOROOT
 ```
 
 **解决方案**：
@@ -261,7 +261,7 @@ go env -w GO111MODULE=on
 ### 1. 克隆仓库
 
 ```bash
-git clone https://github.com/scagogogo/cve.git
+git clone https://github.com/scagogogo/cve-skills.git
 cd cve
 ```
 

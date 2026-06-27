@@ -15,7 +15,7 @@ hero:
       link: /api/
     - theme: alt
       text: 查看 GitHub
-      link: https://github.com/scagogogo/cve
+      link: https://github.com/scagogogo/cve-skills
 
 features:
   - icon: 🔍
@@ -43,7 +43,7 @@ features:
 ### 安装
 
 ```bash
-go get github.com/scagogogo/cve
+go get github.com/scagogogo/cve-skills
 ```
 
 ### 基本使用
@@ -53,7 +53,7 @@ package main
 
 import (
     "fmt"
-    "github.com/scagogogo/cve"
+    "github.com/scagogogo/cve-skills"
 )
 
 func main() {

@@ -71,7 +71,7 @@ package main
 
 import (
     "fmt"
-    "github.com/scagogogo/cve"
+    "github.com/scagogogo/cve-skills"
 )
 
 func main() {
@@ -199,7 +199,7 @@ package main
 
 import (
     "fmt"
-    "github.com/scagogogo/cve"
+    "github.com/scagogogo/cve-skills"
 )
 
 func main() {
@@ -559,7 +559,7 @@ Chinese section (around line 94):
 - Create: `examples/31_format_seq/main.go`
 - Modify: `examples/README.md`
 
-**Pattern to follow:** Each example is a standalone `main.go` in a numbered directory, imports `github.com/scagogogo/cve`, prints a descriptive header, demonstrates the function with realistic data, and shows use case scenarios. See `examples/16_remove_duplicate_cves/main.go` for the reference pattern.
+**Pattern to follow:** Each example is a standalone `main.go` in a numbered directory, imports `github.com/scagogogo/cve-skills`, prints a descriptive header, demonstrates the function with realistic data, and shows use case scenarios. See `examples/16_remove_duplicate_cves/main.go` for the reference pattern.
 
 - [ ] **Step 1: Create `examples/20_intersect_cves/main.go` — Demonstrate IntersectCves**
 
@@ -571,7 +571,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/scagogogo/cve"
+	"github.com/scagogogo/cve-skills"
 )
 
 func main() {
@@ -611,7 +611,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/scagogogo/cve"
+	"github.com/scagogogo/cve-skills"
 )
 
 func main() {
@@ -649,7 +649,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/scagogogo/cve"
+	"github.com/scagogogo/cve-skills"
 )
 
 func main() {
@@ -688,7 +688,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/scagogogo/cve"
+	"github.com/scagogogo/cve-skills"
 )
 
 func main() {
@@ -731,7 +731,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/scagogogo/cve"
+	"github.com/scagogogo/cve-skills"
 )
 
 func main() {
@@ -774,7 +774,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/scagogogo/cve"
+	"github.com/scagogogo/cve-skills"
 )
 
 func main() {
@@ -823,7 +823,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/scagogogo/cve"
+	"github.com/scagogogo/cve-skills"
 )
 
 func main() {
@@ -876,7 +876,7 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/scagogogo/cve"
+	"github.com/scagogogo/cve-skills"
 )
 
 func main() {
@@ -925,7 +925,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/scagogogo/cve"
+	"github.com/scagogogo/cve-skills"
 )
 
 func main() {
@@ -961,7 +961,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/scagogogo/cve"
+	"github.com/scagogogo/cve-skills"
 )
 
 func main() {
@@ -1002,7 +1002,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/scagogogo/cve"
+	"github.com/scagogogo/cve-skills"
 )
 
 func main() {
@@ -1047,7 +1047,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/scagogogo/cve"
+	"github.com/scagogogo/cve-skills"
 )
 
 func main() {
@@ -1132,7 +1132,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/scagogogo/cve"
+	"github.com/scagogogo/cve-skills"
 	"github.com/spf13/cobra"
 )
 
@@ -1209,7 +1209,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/scagogogo/cve"
+	"github.com/scagogogo/cve-skills"
 	"github.com/spf13/cobra"
 )
 
@@ -1274,7 +1274,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/scagogogo/cve"
+	"github.com/scagogogo/cve-skills"
 	"github.com/spf13/cobra"
 )
 
@@ -1334,7 +1334,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/scagogogo/cve"
+	"github.com/scagogogo/cve-skills"
 	"github.com/spf13/cobra"
 )
 
@@ -1418,7 +1418,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/scagogogo/cve"
+	"github.com/scagogogo/cve-skills"
 	"github.com/spf13/cobra"
 )
 
@@ -1480,7 +1480,7 @@ func init() {
 Run: `go test ./...`
 Expected:
   - Exit code: 0
-  - Output contains: "ok  github.com/scagogogo/cve"
+  - Output contains: "ok  github.com/scagogogo/cve-skills"
   - Output does NOT contain: "FAIL"
 
 - [ ] **Step 2: Verify all new Go files compile**
@@ -1490,7 +1490,7 @@ Expected:
   - Output is empty (no errors)
 
 - [ ] **Step 3: Verify test coverage on core library**
-Run: `go test -cover github.com/scagogogo/cve`
+Run: `go test -cover github.com/scagogogo/cve-skills`
 Expected:
   - Exit code: 0
   - Output contains: "coverage:" with >= 90%

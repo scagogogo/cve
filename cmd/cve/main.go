@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/scagogogo/cve/cmd"
+	"github.com/scagogogo/cve-skills/cmd"
 )
 
 func main() {

@@ -1,6 +1,6 @@
 # CVE工具包使用示例
 
-本目录包含了 `github.com/scagogogo/cve` 包的所有API函数的使用示例。每个示例都是一个独立的Go程序，展示了相应函数的基本用法和应用场景。
+本目录包含了 `github.com/scagogogo/cve-skills` 包的所有API函数的使用示例。每个示例都是一个独立的Go程序，展示了相应函数的基本用法和应用场景。
 
 ## 示例目录
 
@@ -54,10 +54,10 @@ go run main.go
 
 ## 安装依赖
 
-运行这些示例前，请确保已安装 `github.com/scagogogo/cve` 包：
+运行这些示例前，请确保已安装 `github.com/scagogogo/cve-skills` 包：
 
 ```bash
-go get github.com/scagogogo/cve
+go get github.com/scagogogo/cve-skills
 ```
 
 ## 版本要求
