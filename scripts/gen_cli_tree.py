@@ -2,6 +2,7 @@
 """Generate a CLI command tree diagram for the CVE Utils project."""
 
 import matplotlib
+import os
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from matplotlib.patches import FancyBboxPatch
@@ -193,7 +194,7 @@ def draw_cli_tree():
                       edgecolor='#b2bec3', linewidth=1, alpha=0.8))
 
     plt.tight_layout(pad=0.5)
-    plt.savefig('/home/cc11001100/github/scagogogo/cve-skills/docs/images/cli-tree.png',
+    plt.savefig(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'docs', 'images', 'cli-tree.png'),
                 dpi=150, bbox_inches='tight', facecolor='#fafbfc')
     print("CLI tree diagram saved!")
 

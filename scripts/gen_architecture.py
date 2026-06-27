@@ -2,6 +2,7 @@
 """Generate an architecture overview diagram for the CVE Utils project."""
 
 import matplotlib
+import os
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
@@ -148,7 +149,7 @@ def draw_architecture():
     ax.axhline(y=0.8, color='#b2bec3', linewidth=0.8, linestyle='--', alpha=0.4, xmin=0.02, xmax=0.85)
 
     plt.tight_layout(pad=0.5)
-    plt.savefig('/home/cc11001100/github/scagogogo/cve-skills/docs/images/architecture.png',
+    plt.savefig(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'docs', 'images', 'architecture.png'),
                 dpi=150, bbox_inches='tight', facecolor='#f0f0f5')
     print("Architecture diagram saved!")
 

@@ -2,6 +2,7 @@
 """Generate a feature mind map for the CVE Utils project (no emoji, clean style)."""
 
 import matplotlib
+import os
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from matplotlib.patches import FancyBboxPatch, FancyArrowPatch
@@ -152,7 +153,7 @@ def draw_mindmap():
             fontsize=13, color='#636e72', ha='center', va='center', style='italic')
 
     plt.tight_layout(pad=0.5)
-    plt.savefig('/home/cc11001100/github/scagogogo/cve-skills/docs/images/feature-map.png',
+    plt.savefig(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'docs', 'images', 'feature-map.png'),
                 dpi=150, bbox_inches='tight', facecolor='#fafbfc')
     print("Feature map saved!")
 
