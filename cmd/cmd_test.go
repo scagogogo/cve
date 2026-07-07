@@ -49,9 +49,27 @@ func TestReadInputsFromStdin(t *testing.T) {
 	}
 }
 
-// TestReadInputsEmptyArgsNoPipe 覆盖 stdin 无数据分支：
-// 用空管道（非字符设备，但无数据）触发 lines 为空的路径，断言返回 nil 或空切片。
-func TestReadInputsEmptyArgsNoPipe(t *testing.T) {
+// TestReadInputsCharDevice 覆盖字符设备分支（helpers.go:17）：
+// /dev/null 是字符设备，(stat.Mode() & os.ModeCharDevice) != 0 为真 → return nil。
+func TestReadInputsCharDevice(t *testing.T) {
+	originalStdin := os.Stdin
+	defer func() { os.Stdin = originalStdin }()
+
+	f, err := os.Open("/dev/null")
+	if err != nil {
+		t.Skipf("/dev/null not available: %v", err)
+	}
+	defer f.Close()
+	os.Stdin = f
+
+	got := readInputs(nil)
+	if got != nil {
+		t.Fatalf("readInputs(nil) with /dev/null (char device) = %v, want nil", got)
+	}
+}
+
+// TestReadInputsEmptyPipe 覆盖 stdin 管道 EOF 分支：scanner 零迭代，lines 为 nil。
+func TestReadInputsEmptyPipe(t *testing.T) {
 	originalStdin := os.Stdin
 	defer func() { os.Stdin = originalStdin }()
 
