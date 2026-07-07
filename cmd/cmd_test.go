@@ -780,3 +780,78 @@ func TestCLIFilterValid(t *testing.T) {
 		t.Fatalf("cve filter-valid stdout = %q, want %q", stdout, "CVE-2022-12345\n")
 	}
 }
+
+// TestCLISortNoInput 覆盖 compare sort 空输入 → os.Exit(1)。
+func TestCLISortNoInput(t *testing.T) {
+	_, _, code := runCve(t, "compare", "sort")
+	if code != 1 {
+		t.Fatalf("cve compare sort (no input) exit code = %d, want 1", code)
+	}
+}
+
+// TestCLIExtractSubcommandsNoInput 覆盖 extract first/last/year/seq/split 空输入 → os.Exit(1)。
+func TestCLIExtractSubcommandsNoInput(t *testing.T) {
+	for _, sub := range []string{"first", "last", "year", "seq", "split"} {
+		t.Run(sub, func(t *testing.T) {
+			_, _, code := runCve(t, "extract", sub)
+			if code != 1 {
+				t.Fatalf("cve extract %s (no input) exit code = %d, want 1", sub, code)
+			}
+		})
+	}
+}
+
+// TestCLIValidateSubcommandsNoInput 覆盖 validate is-cve/contains-cve/year-ok 空输入 → os.Exit(1)。
+func TestCLIValidateSubcommandsNoInput(t *testing.T) {
+	for _, sub := range []string{"is-cve", "contains-cve", "year-ok"} {
+		t.Run(sub, func(t *testing.T) {
+			_, _, code := runCve(t, "validate", sub)
+			if code != 1 {
+				t.Fatalf("cve validate %s (no input) exit code = %d, want 1", sub, code)
+			}
+		})
+	}
+}
+
+// TestCLIFilterSubcommandsNoInput 覆盖 filter by-year/by-year-range/recent/group-by-year/dedup 的"flag 有效 + 输入空"路径 → os.Exit(1)。
+func TestCLIFilterSubcommandsNoInput(t *testing.T) {
+	cases := []struct {
+		args []string
+	}{
+		{[]string{"filter", "by-year", "--year", "2022"}},
+		{[]string{"filter", "by-year-range", "--start", "2021", "--end", "2022"}},
+		{[]string{"filter", "recent", "--years", "2"}},
+		{[]string{"filter", "group-by-year"}},
+		{[]string{"filter", "dedup"}},
+	}
+	for _, tc := range cases {
+		t.Run(strings.Join(tc.args, " "), func(t *testing.T) {
+			_, _, code := runCve(t, tc.args...)
+			if code != 1 {
+				t.Fatalf("%v (no input) exit code = %d, want 1", tc.args, code)
+			}
+		})
+	}
+}
+
+// TestCLIFilterParentHelp 覆盖 filter 父命令无子命令 → cmd.Help()，exit 0。
+func TestCLIFilterParentHelp(t *testing.T) {
+	stdout, _, code := runCve(t, "filter")
+	if code != 0 {
+		t.Fatalf("cve filter (no subcommand) exit code = %d, want 0 (Help)", code)
+	}
+	if !strings.Contains(stdout, "Filter") && !strings.Contains(stdout, "filter") {
+		t.Fatalf("cve filter (no subcommand) stdout missing help: %q", stdout)
+	}
+}
+
+// TestCLIGenerateParentHelp 覆盖 generate 父命令无子命令 → cmd.Help()，exit 0。
+func TestCLIGenerateParentHelp(t *testing.T) {
+	stdout, _, code := runCve(t, "generate")
+	if code != 0 {
+		t.Fatalf("cve generate (no subcommand) exit code = %d, want 0 (Help)", code)
+	}
+	if !strings.Contains(stdout, "Generate") && !strings.Contains(stdout, "generate") {
+		t.Fatalf("cve generate (no subcommand) stdout missing help: %q", stdout)
+	}
+}
