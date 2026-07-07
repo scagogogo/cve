@@ -410,12 +410,19 @@ func TestCLIFilterByYearRangeMissingFlag(t *testing.T) {
 
 // TestCLIFilterRecent 覆盖 recent --years 有效（输出依赖当前年，断言子集）。
 func TestCLIFilterRecent(t *testing.T) {
+	currentYear := time.Now().Year()
+	// 用当前年份的 CVE 确保落在"最近 N 年"范围内，使 GetRecentCves 返回非空，
+	// 从而覆盖 `for _, c := range filtered { fmt.Println(c) }` 循环体（filter.go:93-95）。
+	recentCve := fmt.Sprintf("CVE-%d-2222", currentYear)
 	stdout, _, code := runCve(t, "filter", "recent", "--years", "2",
-		"CVE-2000-1111", "CVE-2022-2222")
+		"CVE-2000-1111", recentCve)
 	if code != 0 {
 		t.Fatalf("cve filter recent exit code = %d, want 0", code)
 	}
-	// 2022 在最近 2 年内则应被保留；2000 一定被排除。仅断言 2000 不出现。
+	// 当前年份 CVE 应被保留；2000 一定被排除。
+	if !strings.Contains(stdout, recentCve) {
+		t.Fatalf("cve filter recent should keep %s, got %q", recentCve, stdout)
+	}
 	if strings.Contains(stdout, "CVE-2000-1111") {
 		t.Fatalf("cve filter recent should exclude CVE-2000-1111, got %q", stdout)
 	}
