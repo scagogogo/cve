@@ -855,3 +855,29 @@ func TestCLIGenerateParentHelp(t *testing.T) {
 		t.Fatalf("cve generate (no subcommand) stdout missing help: %q", stdout)
 	}
 }
+
+// TestCLINoArgEmptyInput 覆盖各命令"零位置参数 + 空输入"路径，触发 len(inputs)==0/<2 的 error/os.Exit(1) 分支。
+// 现有的 TooFewArgs 测试传了 1 个参数（len==1），未触达 len==0；此测试不传任何位置参数，
+// readInputs 收到空 args 且 stdin 为 /dev/null（字符设备）→ 返回 nil → 命中 len(inputs)==0 分支。
+func TestCLINoArgEmptyInput(t *testing.T) {
+	cases := []struct {
+		name string
+		args []string
+	}{
+		{"count-by-year no args", []string{"count-by-year"}},
+		{"year-range no args", []string{"year-range"}},
+		{"validate-batch no args", []string{"validate-batch"}},
+		{"filter-valid no args", []string{"filter-valid"}},
+		{"filter recent flag no input", []string{"filter", "recent", "--years", "2"}},
+		{"parse-range no args", []string{"parse-range"}},
+		{"is-consecutive no args", []string{"is-consecutive"}},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			_, _, code := runCve(t, tc.args...)
+			if code != 1 {
+				t.Fatalf("%v exit code = %d, want 1 (empty input → error/exit)", tc.args, code)
+			}
+		})
+	}
+}
