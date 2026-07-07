@@ -499,8 +499,9 @@ func TestCLIContainsCve(t *testing.T) {
 	}
 }
 
-// TestCLIYearOkNoCutoff 覆盖 year-ok cutoff==0 分支（走 IsCveYearOk）。
+// TestCLIYearOkNoCutoff 覆盖 year-ok cutoff==0 分支（走 IsCveYearOk）：true 与 false 两路径。
 func TestCLIYearOkNoCutoff(t *testing.T) {
+	// true 路径：1999..当前年
 	stdout, _, code := runCve(t, "validate", "year-ok", "CVE-2022-12345")
 	if code != 0 {
 		t.Fatalf("cve validate year-ok exit code = %d, want 0", code)
@@ -508,22 +509,42 @@ func TestCLIYearOkNoCutoff(t *testing.T) {
 	if !strings.Contains(stdout, "CVE-2022-12345\ttrue") {
 		t.Fatalf("cve year-ok stdout missing true: %q", stdout)
 	}
+
+	// false 路径：年份 < 1999
+	stdout, _, code = runCve(t, "validate", "year-ok", "CVE-1998-12345")
+	if code != 0 {
+		t.Fatalf("cve validate year-ok (old year) exit code = %d, want 0", code)
+	}
+	if !strings.Contains(stdout, "CVE-1998-12345\tfalse") {
+		t.Fatalf("cve year-ok stdout missing false for old year: %q", stdout)
+	}
 }
 
-// TestCLIYearOkWithCutoff 覆盖 year-ok cutoff>0 分支（走 IsCveYearOkWithCutoff）。
+// TestCLIYearOkWithCutoff 覆盖 year-ok cutoff>0 分支（走 IsCveYearOkWithCutoff）：true 与 false 两路径。
 func TestCLIYearOkWithCutoff(t *testing.T) {
+	currentYear := time.Now().Year()
+
+	// true 路径：2030 在当前年+5 容忍范围内（当前年+5 >= 2030 时为 true）
 	stdout, _, code := runCve(t, "validate", "year-ok", "--cutoff", "5", "CVE-2030-12345")
 	if code != 0 {
 		t.Fatalf("cve validate year-ok --cutoff exit code = %d, want 0", code)
 	}
-	// 2030 <= 当前年+5（假设当前年<=2025），应有效。用动态期望。
-	currentYear := time.Now().Year()
 	wantSuffix := "false"
 	if 2030 <= currentYear+5 {
 		wantSuffix = "true"
 	}
 	if !strings.Contains(stdout, "CVE-2030-12345\t"+wantSuffix) {
-		t.Fatalf("cve year-ok --cutoff 5 stdout = %q, want suffix %q", stdout, wantSuffix)
+		t.Fatalf("cve year-ok --cutoff 5 (2030) stdout = %q, want suffix %q", stdout, wantSuffix)
+	}
+
+	// false 路径：极远未来年份，超出当前年+5 容忍范围，必为 false
+	farFuture := fmt.Sprintf("CVE-%d-12345", currentYear+100)
+	stdout, _, code = runCve(t, "validate", "year-ok", "--cutoff", "5", farFuture)
+	if code != 0 {
+		t.Fatalf("cve validate year-ok --cutoff (far future) exit code = %d, want 0", code)
+	}
+	if !strings.Contains(stdout, farFuture+"\tfalse") {
+		t.Fatalf("cve year-ok --cutoff 5 (far future) stdout = %q, want false", stdout)
 	}
 }
 
