@@ -6,9 +6,11 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"sync"
 	"testing"
+	"time"
 
 	cve "github.com/scagogogo/cve-skills"
 )
@@ -265,4 +267,495 @@ func TestMain(m *testing.M) {
 	}
 
 	os.Exit(code)
+}
+
+// TestCLIFormat 覆盖 format 命令：有 args → 逐个格式化打印（Run 闭包 for 循环）。
+func TestCLIFormat(t *testing.T) {
+	stdout, _, code := runCve(t, "format", "cve-2022-12345", " cve-2021-44228 ")
+	if code != 0 {
+		t.Fatalf("cve format exit code = %d, want 0", code)
+	}
+	want := "CVE-2022-12345\nCVE-2021-44228\n"
+	if stdout != want {
+		t.Fatalf("cve format stdout = %q, want %q", stdout, want)
+	}
+}
+
+// TestCLIFormatNoInput 覆盖 format 命令空输入分支：len(inputs)==0 → os.Exit(1)。
+func TestCLIFormatNoInput(t *testing.T) {
+	_, _, code := runCve(t, "format")
+	if code != 1 {
+		t.Fatalf("cve format (no input) exit code = %d, want 1", code)
+	}
+}
+
+// TestCLIExtract 覆盖 extract 命令：从文本提取多个 CVE 并逐行打印。
+func TestCLIExtract(t *testing.T) {
+	stdout, _, code := runCve(t, "extract", "affected by CVE-2021-44228 and cve-2022-12345")
+	if code != 0 {
+		t.Fatalf("cve extract exit code = %d, want 0", code)
+	}
+	want := "CVE-2021-44228\nCVE-2022-12345\n"
+	if stdout != want {
+		t.Fatalf("cve extract stdout = %q, want %q", stdout, want)
+	}
+}
+
+// TestCLIExtractSubcommands 覆盖 first/last/year/seq/split 子命令的 Run 闭包。
+func TestCLIExtractSubcommands(t *testing.T) {
+	cases := []struct {
+		args []string
+		want string
+	}{
+		{[]string{"extract", "first", "CVE-2021-44228 and CVE-2022-12345"}, "CVE-2021-44228\n"},
+		{[]string{"extract", "last", "CVE-2021-44228 and CVE-2022-12345"}, "CVE-2022-12345\n"},
+		{[]string{"extract", "year", "CVE-2022-12345"}, "2022\n"},
+		{[]string{"extract", "seq", "CVE-2022-12345"}, "12345\n"},
+		{[]string{"extract", "split", "CVE-2022-12345"}, "2022\t12345\n"},
+	}
+	for _, tc := range cases {
+		t.Run(strings.Join(tc.args, " "), func(t *testing.T) {
+			stdout, _, code := runCve(t, tc.args...)
+			if code != 0 {
+				t.Fatalf("%v exit code = %d, want 0", tc.args, code)
+			}
+			if stdout != tc.want {
+				t.Fatalf("%v stdout = %q, want %q", tc.args, stdout, tc.want)
+			}
+		})
+	}
+}
+
+// TestCLIExtractNoInput 覆盖 extract 空输入 → os.Exit(1)。
+func TestCLIExtractNoInput(t *testing.T) {
+	_, _, code := runCve(t, "extract")
+	if code != 1 {
+		t.Fatalf("cve extract (no input) exit code = %d, want 1", code)
+	}
+}
+
+// TestCLICompare 覆盖 compare 命令（ExactArgs(2)）：CompareCves 返回值打印。
+func TestCLICompare(t *testing.T) {
+	stdout, _, code := runCve(t, "compare", "CVE-2021-44228", "CVE-2022-12345")
+	if code != 0 {
+		t.Fatalf("cve compare exit code = %d, want 0", code)
+	}
+	if stdout != "-1\n" {
+		t.Fatalf("cve compare stdout = %q, want %q", stdout, "-1\n")
+	}
+}
+
+// TestCLICompareByYear 覆盖 compare by-year 子命令。
+func TestCLICompareByYear(t *testing.T) {
+	stdout, _, code := runCve(t, "compare", "by-year", "CVE-2021-44228", "CVE-2022-12345")
+	if code != 0 {
+		t.Fatalf("cve compare by-year exit code = %d, want 0", code)
+	}
+	if stdout != "-1\n" {
+		t.Fatalf("cve compare by-year stdout = %q, want %q", stdout, "-1\n")
+	}
+}
+
+// TestCLISort 覆盖 compare sort 子命令：readInputs + SortCves 逐行打印。
+func TestCLISort(t *testing.T) {
+	stdout, _, code := runCve(t, "compare", "sort", "CVE-2022-2222", "CVE-2020-1111", "CVE-2022-1111")
+	if code != 0 {
+		t.Fatalf("cve compare sort exit code = %d, want 0", code)
+	}
+	want := "CVE-2020-1111\nCVE-2022-1111\nCVE-2022-2222\n"
+	if stdout != want {
+		t.Fatalf("cve compare sort stdout = %q, want %q", stdout, want)
+	}
+}
+
+// TestCLIFilterByYear 覆盖 by-year --year 有效 → FilterCvesByYear 打印。
+func TestCLIFilterByYear(t *testing.T) {
+	stdout, _, code := runCve(t, "filter", "by-year", "--year", "2022", "CVE-2021-1111", "CVE-2022-2222")
+	if code != 0 {
+		t.Fatalf("cve filter by-year exit code = %d, want 0", code)
+	}
+	if stdout != "CVE-2022-2222\n" {
+		t.Fatalf("cve filter by-year stdout = %q, want %q", stdout, "CVE-2022-2222\n")
+	}
+}
+
+// TestCLIFilterByYearMissingFlag 覆盖 --year==0 → 报错 os.Exit(1)。
+func TestCLIFilterByYearMissingFlag(t *testing.T) {
+	_, _, code := runCve(t, "filter", "by-year", "CVE-2022-1")
+	if code != 1 {
+		t.Fatalf("cve filter by-year (no --year) exit code = %d, want 1", code)
+	}
+}
+
+// TestCLIFilterByYearRange 覆盖 by-year-range --start/--end 有效。
+func TestCLIFilterByYearRange(t *testing.T) {
+	stdout, _, code := runCve(t, "filter", "by-year-range", "--start", "2021", "--end", "2022",
+		"CVE-2020-1111", "CVE-2021-2222", "CVE-2022-3333")
+	if code != 0 {
+		t.Fatalf("cve filter by-year-range exit code = %d, want 0", code)
+	}
+	want := "CVE-2021-2222\nCVE-2022-3333\n"
+	if stdout != want {
+		t.Fatalf("cve filter by-year-range stdout = %q, want %q", stdout, want)
+	}
+}
+
+// TestCLIFilterByYearRangeMissingFlag 覆盖 --start==0 或 --end==0 → os.Exit(1)。
+func TestCLIFilterByYearRangeMissingFlag(t *testing.T) {
+	_, _, code := runCve(t, "filter", "by-year-range", "--end", "2022", "CVE-2022-1")
+	if code != 1 {
+		t.Fatalf("cve filter by-year-range (no --start) exit code = %d, want 1", code)
+	}
+}
+
+// TestCLIFilterRecent 覆盖 recent --years 有效（输出依赖当前年，断言子集）。
+func TestCLIFilterRecent(t *testing.T) {
+	stdout, _, code := runCve(t, "filter", "recent", "--years", "2",
+		"CVE-2000-1111", "CVE-2022-2222")
+	if code != 0 {
+		t.Fatalf("cve filter recent exit code = %d, want 0", code)
+	}
+	// 2022 在最近 2 年内则应被保留；2000 一定被排除。仅断言 2000 不出现。
+	if strings.Contains(stdout, "CVE-2000-1111") {
+		t.Fatalf("cve filter recent should exclude CVE-2000-1111, got %q", stdout)
+	}
+}
+
+// TestCLIFilterRecentMissingFlag 覆盖 --years==0 → os.Exit(1)。
+func TestCLIFilterRecentMissingFlag(t *testing.T) {
+	_, _, code := runCve(t, "filter", "recent", "CVE-2022-1")
+	if code != 1 {
+		t.Fatalf("cve filter recent (no --years) exit code = %d, want 1", code)
+	}
+}
+
+// TestCLIGroupByYear 覆盖 group-by-year：按年分组打印（map 遍历顺序不定，断言内容存在）。
+func TestCLIGroupByYear(t *testing.T) {
+	stdout, _, code := runCve(t, "filter", "group-by-year", "CVE-2021-1111", "CVE-2022-2222")
+	if code != 0 {
+		t.Fatalf("cve filter group-by-year exit code = %d, want 0", code)
+	}
+	if !strings.Contains(stdout, "2021:") || !strings.Contains(stdout, "2022:") {
+		t.Fatalf("cve filter group-by-year stdout missing year groups: %q", stdout)
+	}
+}
+
+// TestCLIDedup 覆盖 dedup：去重后逐行打印。
+func TestCLIDedup(t *testing.T) {
+	stdout, _, code := runCve(t, "filter", "dedup", "CVE-2022-1111", "cve-2022-1111", "CVE-2022-2222")
+	if code != 0 {
+		t.Fatalf("cve filter dedup exit code = %d, want 0", code)
+	}
+	want := "CVE-2022-1111\nCVE-2022-2222\n"
+	if stdout != want {
+		t.Fatalf("cve filter dedup stdout = %q, want %q", stdout, want)
+	}
+}
+
+// TestCLIValidate 覆盖 validate 命令：Format + ValidateCve 打印（有效与无效各一）。
+func TestCLIValidate(t *testing.T) {
+	stdout, _, code := runCve(t, "validate", "CVE-2022-12345", "CVE-1998-1")
+	if code != 0 {
+		t.Fatalf("cve validate exit code = %d, want 0", code)
+	}
+	if !strings.Contains(stdout, "CVE-2022-12345\ttrue") {
+		t.Fatalf("cve validate stdout missing valid entry: %q", stdout)
+	}
+	if !strings.Contains(stdout, "CVE-1998-1\tfalse") {
+		t.Fatalf("cve validate stdout missing invalid entry: %q", stdout)
+	}
+}
+
+// TestCLIValidateNoInput 覆盖 validate 空输入 → os.Exit(1)。
+func TestCLIValidateNoInput(t *testing.T) {
+	_, _, code := runCve(t, "validate")
+	if code != 1 {
+		t.Fatalf("cve validate (no input) exit code = %d, want 1", code)
+	}
+}
+
+// TestCLIIsCve 覆盖 is-cve：打印 input\ttrue/false。
+func TestCLIIsCve(t *testing.T) {
+	stdout, _, code := runCve(t, "validate", "is-cve", "CVE-2022-12345", "not-a-cve")
+	if code != 0 {
+		t.Fatalf("cve validate is-cve exit code = %d, want 0", code)
+	}
+	if !strings.Contains(stdout, "CVE-2022-12345\ttrue") {
+		t.Fatalf("cve is-cve stdout missing true entry: %q", stdout)
+	}
+	if !strings.Contains(stdout, "not-a-cve\tfalse") {
+		t.Fatalf("cve is-cve stdout missing false entry: %q", stdout)
+	}
+}
+
+// TestCLIContainsCve 覆盖 contains-cve：打印 true/false。
+func TestCLIContainsCve(t *testing.T) {
+	stdout, _, code := runCve(t, "validate", "contains-cve", "has CVE-2022-12345", "no cve here")
+	if code != 0 {
+		t.Fatalf("cve validate contains-cve exit code = %d, want 0", code)
+	}
+	if !strings.Contains(stdout, "true") || !strings.Contains(stdout, "false") {
+		t.Fatalf("cve contains-cve stdout missing true/false: %q", stdout)
+	}
+}
+
+// TestCLIYearOkNoCutoff 覆盖 year-ok cutoff==0 分支（走 IsCveYearOk）。
+func TestCLIYearOkNoCutoff(t *testing.T) {
+	stdout, _, code := runCve(t, "validate", "year-ok", "CVE-2022-12345")
+	if code != 0 {
+		t.Fatalf("cve validate year-ok exit code = %d, want 0", code)
+	}
+	if !strings.Contains(stdout, "CVE-2022-12345\ttrue") {
+		t.Fatalf("cve year-ok stdout missing true: %q", stdout)
+	}
+}
+
+// TestCLIYearOkWithCutoff 覆盖 year-ok cutoff>0 分支（走 IsCveYearOkWithCutoff）。
+func TestCLIYearOkWithCutoff(t *testing.T) {
+	stdout, _, code := runCve(t, "validate", "year-ok", "--cutoff", "5", "CVE-2030-12345")
+	if code != 0 {
+		t.Fatalf("cve validate year-ok --cutoff exit code = %d, want 0", code)
+	}
+	// 2030 <= 当前年+5（假设当前年<=2025），应有效。用动态期望。
+	currentYear := time.Now().Year()
+	wantSuffix := "false"
+	if 2030 <= currentYear+5 {
+		wantSuffix = "true"
+	}
+	if !strings.Contains(stdout, "CVE-2030-12345\t"+wantSuffix) {
+		t.Fatalf("cve year-ok --cutoff 5 stdout = %q, want suffix %q", stdout, wantSuffix)
+	}
+}
+
+// TestCLIGenerateCve 覆盖 generate cve --year/--seq 有效。
+func TestCLIGenerateCve(t *testing.T) {
+	stdout, _, code := runCve(t, "generate", "cve", "--year", "2022", "--seq", "12345")
+	if code != 0 {
+		t.Fatalf("cve generate cve exit code = %d, want 0", code)
+	}
+	if stdout != "CVE-2022-12345\n" {
+		t.Fatalf("cve generate cve stdout = %q, want %q", stdout, "CVE-2022-12345\n")
+	}
+}
+
+// TestCLIGenerateCveMissingFlag 覆盖 year==0 或 seq==0 → 打印 error（return，不 exit 1，但 cobra 不视为 error，exit 0）。
+func TestCLIGenerateCveMissingFlag(t *testing.T) {
+	stdout, _, code := runCve(t, "generate", "cve", "--year", "2022")
+	if code != 0 {
+		t.Fatalf("cve generate cve (missing --seq) exit code = %d, want 0 (Run uses return not os.Exit)", code)
+	}
+	if !strings.Contains(stdout, "error: --year and --seq are required") {
+		t.Fatalf("cve generate cve (missing --seq) stdout = %q, want error message", stdout)
+	}
+}
+
+// TestCLIGenerateFake 覆盖 generate fake：输出随机但匹配 CVE 格式。
+func TestCLIGenerateFake(t *testing.T) {
+	stdout, _, code := runCve(t, "generate", "fake")
+	if code != 0 {
+		t.Fatalf("cve generate fake exit code = %d, want 0", code)
+	}
+	// 断言输出形如 CVE-YYYY-NNNNN
+	if !regexp.MustCompile(`(?i)^CVE-\d{4}-\d+\s*$`).MatchString(stdout) {
+		t.Fatalf("cve generate fake stdout = %q, want a CVE-shaped string", stdout)
+	}
+}
+
+// TestCLIFilterPattern 覆盖 filter-pattern RunE：正常匹配 + 参数不足 error。
+func TestCLIFilterPattern(t *testing.T) {
+	stdout, _, code := runCve(t, "filter-pattern", "CVE-2022-*", "CVE-2022-1111,CVE-2023-2222")
+	if code != 0 {
+		t.Fatalf("cve filter-pattern exit code = %d, want 0", code)
+	}
+	if stdout != "CVE-2022-1111\n" {
+		t.Fatalf("cve filter-pattern stdout = %q, want %q", stdout, "CVE-2022-1111\n")
+	}
+}
+
+// TestCLIFilterPatternTooFewArgs 覆盖 len(inputs)<2 → RunE 返回 error → exit 1。
+func TestCLIFilterPatternTooFewArgs(t *testing.T) {
+	_, _, code := runCve(t, "filter-pattern", "CVE-2022-*")
+	if code != 1 {
+		t.Fatalf("cve filter-pattern (too few args) exit code = %d, want 1", code)
+	}
+}
+
+// TestCLIFormatSeq 覆盖 format-seq RunE：正常 + 宽度非数字 error + 参数不足 error。
+func TestCLIFormatSeq(t *testing.T) {
+	stdout, _, code := runCve(t, "format-seq", "6", "CVE-2022-123")
+	if code != 0 {
+		t.Fatalf("cve format-seq exit code = %d, want 0", code)
+	}
+	if stdout != "CVE-2022-000123\n" {
+		t.Fatalf("cve format-seq stdout = %q, want %q", stdout, "CVE-2022-000123\n")
+	}
+}
+
+// TestCLIFormatSeqInvalidWidth 覆盖 strconv.Atoi 失败 → RunE 返回 error → exit 1。
+func TestCLIFormatSeqInvalidWidth(t *testing.T) {
+	_, _, code := runCve(t, "format-seq", "abc", "CVE-2022-123")
+	if code != 1 {
+		t.Fatalf("cve format-seq (invalid width) exit code = %d, want 1", code)
+	}
+}
+
+// TestCLIFormatSeqTooFewArgs 覆盖 len(inputs)<2 → exit 1。
+func TestCLIFormatSeqTooFewArgs(t *testing.T) {
+	_, _, code := runCve(t, "format-seq", "6")
+	if code != 1 {
+		t.Fatalf("cve format-seq (too few args) exit code = %d, want 1", code)
+	}
+}
+
+// TestCLIParseRange 覆盖 parse-range RunE：正常展开 + nil 结果 error。
+func TestCLIParseRange(t *testing.T) {
+	stdout, _, code := runCve(t, "parse-range", "CVE-2022-1..3")
+	if code != 0 {
+		t.Fatalf("cve parse-range exit code = %d, want 0", code)
+	}
+	want := "CVE-2022-1\nCVE-2022-2\nCVE-2022-3\n"
+	if stdout != want {
+		t.Fatalf("cve parse-range stdout = %q, want %q", stdout, want)
+	}
+}
+
+// TestCLIParseRangeInvalid 覆盖 result==nil → RunE 返回 error → exit 1。
+func TestCLIParseRangeInvalid(t *testing.T) {
+	_, _, code := runCve(t, "parse-range", "not-a-range")
+	if code != 1 {
+		t.Fatalf("cve parse-range (invalid) exit code = %d, want 1", code)
+	}
+}
+
+// TestCLIIsConsecutive 覆盖 is-consecutive RunE：连续 true 与非连续 false 两分支。
+func TestCLIIsConsecutive(t *testing.T) {
+	cases := []struct {
+		args []string
+		want string
+	}{
+		{[]string{"is-consecutive", "CVE-2022-1", "CVE-2022-2"}, "CVE-2022-1 and CVE-2022-2 are consecutive\n"},
+		{[]string{"is-consecutive", "CVE-2022-1", "CVE-2022-3"}, "CVE-2022-1 and CVE-2022-3 are NOT consecutive\n"},
+	}
+	for _, tc := range cases {
+		t.Run(strings.Join(tc.args, " "), func(t *testing.T) {
+			stdout, _, code := runCve(t, tc.args...)
+			if code != 0 {
+				t.Fatalf("%v exit code = %d, want 0", tc.args, code)
+			}
+			if stdout != tc.want {
+				t.Fatalf("%v stdout = %q, want %q", tc.args, stdout, tc.want)
+			}
+		})
+	}
+}
+
+// TestCLISetOps 覆盖 intersect/union/diff RunE：正常 + 参数不足 error。
+func TestCLISetOps(t *testing.T) {
+	cases := []struct {
+		args []string
+		want string
+	}{
+		{[]string{"intersect", "CVE-2022-1,CVE-2022-2", "CVE-2022-2,CVE-2022-3"}, "CVE-2022-2\n"},
+		{[]string{"union", "CVE-2022-1", "CVE-2022-2"}, "CVE-2022-1\nCVE-2022-2\n"},
+		{[]string{"diff", "CVE-2022-1,CVE-2022-2", "CVE-2022-2"}, "CVE-2022-1\n"},
+	}
+	for _, tc := range cases {
+		t.Run(tc.args[0], func(t *testing.T) {
+			stdout, _, code := runCve(t, tc.args...)
+			if code != 0 {
+				t.Fatalf("%v exit code = %d, want 0", tc.args, code)
+			}
+			if stdout != tc.want {
+				t.Fatalf("%v stdout = %q, want %q", tc.args, stdout, tc.want)
+			}
+		})
+	}
+}
+
+// TestCLISetOpsTooFewArgs 覆盖 intersect/union/diff len(inputs)<2 → exit 1。
+func TestCLISetOpsTooFewArgs(t *testing.T) {
+	for _, op := range []string{"intersect", "union", "diff"} {
+		t.Run(op, func(t *testing.T) {
+			_, _, code := runCve(t, op, "CVE-2022-1")
+			if code != 1 {
+				t.Fatalf("cve %s (too few args) exit code = %d, want 1", op, code)
+			}
+		})
+	}
+}
+
+// TestCLICountByYear 覆盖 count-by-year RunE：正常打印（map 顺序不定，断言内容）。
+func TestCLICountByYear(t *testing.T) {
+	stdout, _, code := runCve(t, "count-by-year", "CVE-2022-1,CVE-2022-2,CVE-2021-3")
+	if code != 0 {
+		t.Fatalf("cve count-by-year exit code = %d, want 0", code)
+	}
+	if !strings.Contains(stdout, "2022: 2") || !strings.Contains(stdout, "2021: 1") {
+		t.Fatalf("cve count-by-year stdout = %q, want counts for 2022:2 and 2021:1", stdout)
+	}
+}
+
+// TestCLIYearRange 覆盖 year-range RunE。
+func TestCLIYearRange(t *testing.T) {
+	stdout, _, code := runCve(t, "year-range", "CVE-2020-1,CVE-2022-2,CVE-2021-3")
+	if code != 0 {
+		t.Fatalf("cve year-range exit code = %d, want 0", code)
+	}
+	want := "Year range: 2020 - 2022 (span: 2 years)\n"
+	if stdout != want {
+		t.Fatalf("cve year-range stdout = %q, want %q", stdout, want)
+	}
+}
+
+// TestCLISeqRange 覆盖 seq-range RunE：正常 + year 非数字 error + 参数不足 error。
+func TestCLISeqRange(t *testing.T) {
+	stdout, _, code := runCve(t, "seq-range", "2022", "CVE-2022-1,CVE-2022-3,CVE-2022-2")
+	if code != 0 {
+		t.Fatalf("cve seq-range exit code = %d, want 0", code)
+	}
+	want := "Year 2022 sequence range: 1 - 3\n"
+	if stdout != want {
+		t.Fatalf("cve seq-range stdout = %q, want %q", stdout, want)
+	}
+}
+
+// TestCLISeqRangeInvalidYear 覆盖 strconv.Atoi(year) 失败 → exit 1。
+func TestCLISeqRangeInvalidYear(t *testing.T) {
+	_, _, code := runCve(t, "seq-range", "abc", "CVE-2022-1")
+	if code != 1 {
+		t.Fatalf("cve seq-range (invalid year) exit code = %d, want 1", code)
+	}
+}
+
+// TestCLISeqRangeTooFewArgs 覆盖 len(inputs)<2 → exit 1。
+func TestCLISeqRangeTooFewArgs(t *testing.T) {
+	_, _, code := runCve(t, "seq-range", "2022")
+	if code != 1 {
+		t.Fatalf("cve seq-range (too few args) exit code = %d, want 1", code)
+	}
+}
+
+// TestCLIValidateBatch 覆盖 validate-batch RunE：r.Valid 真假两分支（✓ 与 ✗）。
+func TestCLIValidateBatch(t *testing.T) {
+	stdout, _, code := runCve(t, "validate-batch", "CVE-2022-12345,CVE-1998-1")
+	if code != 0 {
+		t.Fatalf("cve validate-batch exit code = %d, want 0", code)
+	}
+	if !strings.Contains(stdout, "✓ CVE-2022-12345") {
+		t.Fatalf("cve validate-batch stdout missing valid mark: %q", stdout)
+	}
+	if !strings.Contains(stdout, "✗ CVE-1998-1") || !strings.Contains(stdout, "before 1999") {
+		t.Fatalf("cve validate-batch stdout missing invalid mark/reason: %q", stdout)
+	}
+}
+
+// TestCLIFilterValid 覆盖 filter-valid RunE。
+func TestCLIFilterValid(t *testing.T) {
+	stdout, _, code := runCve(t, "filter-valid", "CVE-2022-12345,not-a-cve,CVE-1998-1")
+	if code != 0 {
+		t.Fatalf("cve filter-valid exit code = %d, want 0", code)
+	}
+	if stdout != "CVE-2022-12345\n" {
+		t.Fatalf("cve filter-valid stdout = %q, want %q", stdout, "CVE-2022-12345\n")
+	}
 }
