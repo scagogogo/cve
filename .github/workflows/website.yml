@@ -1,17 +1,19 @@
+# 部署官网到 GitHub Pages —— push 到 main 触发
+# 单一 VitePress 站点（website/），含中英双语文档 + 下载页 + mermaid 内嵌图。
+# 部署到 https://scagogogo.github.io/cve-skills/
+
 name: Deploy Website
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
     paths:
-      - 'website/**'
-      - 'docs/**'
-      - 'scripts/**'
-      - '.github/workflows/website.yml'
+      - "website/**"
+      - ".github/workflows/website.yml"
   pull_request:
-    branches: [ main ]
+    branches: [main]
     paths:
-      - 'website/**'
+      - "website/**"
 
 permissions:
   contents: read
@@ -28,63 +30,22 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: npm
+          cache-dependency-path: website/package-lock.json
 
-      # === Build VitePress docs ===
-      - name: Install docs dependencies
-        run: |
-          cd docs
-          npm ci
+      - name: Install dependencies
+        working-directory: website
+        run: npm ci
 
-      - name: Build VitePress docs
-        run: |
-          cd docs
-          npm run docs:build
+      - name: Build VitePress site
+        working-directory: website
+        run: npm run build
 
-      # === Generate diagrams ===
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-
-      - name: Install Python dependencies
-        run: pip install matplotlib numpy
-
-      - name: Generate diagrams
-        run: |
-          python3 scripts/gen_architecture.py
-          python3 scripts/gen_feature_map.py
-          python3 scripts/gen_cli_tree.py
-
-      # === Build React website ===
-      - name: Install website dependencies
-        run: |
-          cd website
-          npm ci
-
-      - name: Copy diagrams to website public
-        run: |
-          mkdir -p website/public/images
-          cp docs/images/*.png website/public/images/
-
-      - name: Build React website
-        run: |
-          cd website
-          npm run build
-
-      # === Merge: put VitePress docs under /docs path ===
-      - name: Merge docs into website
-        run: |
-          mkdir -p website/dist/docs
-          cp -r docs/.vitepress/dist/* website/dist/docs/
-
-      # === Upload artifact ===
       - name: Setup Pages
         uses: actions/configure-pages@v4
         with:
@@ -93,7 +54,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: website/dist
+          path: website/.vitepress/dist
 
   deploy:
     if: github.ref == 'refs/heads/main'

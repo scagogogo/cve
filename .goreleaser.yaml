@@ -1,0 +1,127 @@
+# .goreleaser.yaml — CVE Utils CLI 多平台发布配置
+#
+# 触发：推送形如 v* 的 git tag（见 .github/workflows/release.yml）
+# 产物：Linux/macOS/Windows × amd64/arm64/arm 的预编译二进制，附 archives/checksums/changelog
+# 版本号通过 ldflags 注入到 cve.Version（默认 "dev"），AI Agent 既可下载二进制也可从源码编译。
+#
+# 本地预演（不发布）：
+#   goreleaser release --snapshot --clean
+#   goreleaser check
+
+version: 2
+
+project_name: cve
+
+before:
+  hooks:
+    # 发布前确保代码可编译、测试通过
+    - go mod tidy
+    - go test ./...
+
+builds:
+  - id: cve
+    main: ./cmd/cve
+    binary: cve
+    # 版本号注入：构建期用 git tag 覆盖 cve.Version
+    ldflags:
+      - -s -w # 去除符号表与 DWARF，缩小体积
+      - -X github.com/scagogogo/cve-skills.Version={{.Version}}
+    env:
+      - CGO_ENABLED=0 # 纯 Go，静态链接，跨平台零依赖
+    goos:
+      - linux
+      - darwin
+      - windows
+      - freebsd
+    goarch:
+      - amd64
+      - arm64
+      - arm
+      - "386"
+    # arm/386 仅在部分 OS 上有意义，排除无效组合
+    ignore:
+      - goos: darwin
+        goarch: arm
+      - goos: darwin
+        goarch: "386"
+      - goos: windows
+        goarch: arm
+      - goos: windows
+        goarch: "386"
+      - goos: freebsd
+        goarch: arm
+      - goos: freebsd
+        goarch: "386"
+    # 版本号注入仅依赖 git tag，main 分支构建产物同样可用
+    mod_timestamp: "{{ .CommitTimestamp }}"
+
+archives:
+  - id: default
+    # tar.gz 用于类 Unix，zip 用于 Windows
+    name_template: >-
+      {{ .ProjectName }}_{{ .Version }}_
+      {{- if eq .Os "darwin" }}macos
+      {{- else }}{{ .Os }}{{ end }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+    format: tar.gz
+    format_overrides:
+      - goos: windows
+        format: zip
+    files:
+      - README.md
+      - README.zh.md
+      - LICENSE
+
+# Linux deb/rpm/apk（便于 Linux 生态接入）
+nfpms:
+  - file_name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    homepage: https://github.com/scagogogo/cve-skills
+    description: CVE identifier processing CLI
+    license: MIT
+    maintainer: scagogogo <scagogogo@users.noreply.github.com>
+    formats:
+      - deb
+      - rpm
+      - apk
+
+checksum:
+  name_template: "checksums.txt"
+  algorithm: sha256
+
+snapshot:
+  version_template: "{{ .Version }}-next"
+
+changelog:
+  use: git
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^chore:"
+      - "Merge pull request"
+      - "Merge branch"
+
+release:
+  github:
+    owner: scagogogo
+    name: cve-skills
+  draft: false
+  prerelease: auto
+  name_template: "{{ .Tag }}"
+  header: |
+    ## CVE Utils {{ .Tag }}
+
+    AI First 的 CVE 标识符处理工具集。AI Agent 可直接下载对应平台的预编译二进制运行，也可从源码编译：
+    ```bash
+    go install github.com/scagogogo/cve-skills/cmd/cve@{{ .Tag }}
+    ```
+  footer: |
+    ---
+
+    **一键安装（脚本）**：
+    ```bash
+    curl -fsSL https://raw.githubusercontent.com/scagogogo/cve-skills/main/scripts/install.sh | bash
+    ```

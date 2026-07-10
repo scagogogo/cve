@@ -1,0 +1,46 @@
+# 持续集成 —— main 分支与 PR 的构建守门
+# 在测试（go-test.yml）之外，额外校验 goreleaser 配置可用、跨平台二进制可构建。
+# 不发布任何产物，仅做 dry-run / snapshot，确保打 tag 时 release.yml 不会失败。
+#
+# 触发：push 到 main、PR
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  goreleaser-check:
+    name: goreleaser 配置与构建校验
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.18"
+          cache: true
+
+      - name: Check goreleaser config
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          distribution: goreleaser
+          version: "~> v2"
+          args: check
+
+      - name: Build (single-target snapshot, no publish)
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          distribution: goreleaser
+          version: "~> v2"
+          args: build --snapshot --clean --single-target

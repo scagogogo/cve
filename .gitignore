@@ -24,11 +24,10 @@ go.work
 .idea/
 .vscode/
 
-# Documentation dependencies
-docs/node_modules/
-docs/.vitepress/dist/
-docs/.vitepress/cache/
-
-# Website dependencies and build output
+# Website (VitePress) dependencies and build output
 website/node_modules/
-website/dist/
+website/.vitepress/dist/
+website/.vitepress/cache/
+
+# goreleaser build output
+dist/
