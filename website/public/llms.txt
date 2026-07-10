@@ -1,0 +1,40 @@
+# CVE Utils
+
+> AI First Go library + cross-platform CLI for CVE (Common Vulnerabilities and Exposures) identifier processing. 30+ deterministic, single-purpose functions covering format/validate, extract, compare/sort, filter/group, generate, set operations, range parsing and statistics. Zero CVE-format reinvention — install the binary or `go get` the package and call typed functions.
+
+Module path: `github.com/scagogogo/cve-skills`
+License: MIT · Language: Go 1.18+ · Repo: https://github.com/scagogogo/cve-skills
+
+## Install
+
+- Prebuilt binary (no toolchain): `curl -fsSL https://raw.githubusercontent.com/scagogogo/cve-skills/main/scripts/install.sh | bash`
+- Go CLI: `go install github.com/scagogogo/cve-skills/cmd/cve@latest`
+- Go library: `go get github.com/scagogogo/cve-skills`
+- Prebuilt for Linux / macOS / Windows / FreeBSD × amd64 / arm64 / arm / 386, plus deb/rpm/apk.
+
+## Core functions
+
+- Format & Validation: `Format`, `IsCve`, `IsContainsCve`, `ValidateCve`, `IsCveYearOk`, `IsCveYearOkWithCutoff`, `FormatSeq`
+- Extraction: `ExtractCve`, `ExtractFirstCve`, `ExtractLastCve`, `Split`, `ExtractCveYear(AsInt)`, `ExtractCveSeq(AsInt)`
+- Compare & Sort: `CompareCves`, `CompareByYear`, `SubByYear`, `SortCves`
+- Filter & Group: `FilterCvesByYear`, `FilterCvesByYearRange`, `GetRecentCves`, `GroupByYear`, `RemoveDuplicateCves`
+- Generate: `GenerateCve`, `GenerateFakeCve`
+- Set operations: `IntersectCves`, `UnionCves`, `DiffCves`
+- Batch validation: `ValidateCves`, `FilterValidCves`
+- Range & Pattern: `ParseCveRange`, `IsCvesConsecutive`, `FilterCvesByPattern`
+- Statistics: `CountByYear`, `YearRange`, `SeqRange`
+
+## Typical pipeline
+
+```go
+cves := cve.SortCves(cve.RemoveDuplicateCves(cve.ExtractCve(text)))
+```
+
+## Docs
+
+- Getting Started: https://scagogogo.github.io/cve-skills/guide/getting-started
+- API Reference: https://scagogogo.github.io/cve-skills/api/
+- CLI Reference: https://scagogogo.github.io/cve-skills/cli
+- Examples: https://scagogogo.github.io/cve-skills/examples/
+- Download & Install: https://scagogogo.github.io/cve-skills/download
+- GoDoc: https://pkg.go.dev/github.com/scagogogo/cve-skills
