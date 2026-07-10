@@ -814,6 +814,18 @@ func TestSeqRange(t *testing.T) {
 			wantMin: 0,
 			wantMax: 0,
 		},
+		{
+			// 目标年份存在 CVE 但序列号 <= 0 → 跳过该条
+			// 覆盖 filter.go:540-541 的 seq<=0 continue 分支
+			// CVE-2022-0 的 seq 为 0，应被跳过；CVE-2022-5555 正常计入
+			name: "zero sequence skipped",
+			args: args{
+				cveSlice: []string{"CVE-2022-0", "CVE-2022-5555"},
+				year:     2022,
+			},
+			wantMin: 5555,
+			wantMax: 5555,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

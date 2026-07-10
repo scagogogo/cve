@@ -365,6 +365,28 @@ func TestFilterCvesByPattern(t *testing.T) {
 			},
 			want: nil,
 		},
+		{
+			// pattern 含正则特殊字符（. + ( ) [ ] { } \ ^ $ |）
+			// 这些字符应被转义为字面字符而非正则元字符
+			// 覆盖 extract.go:308-310 的 case 转义分支
+			// CVE 字符串不含点号，故转义后的 \. 不匹配任何 CVE → 返回 nil
+			name: "regex special chars escaped as literals",
+			args: args{
+				cveSlice: []string{"CVE-2022-1111", "CVE-2022-2222"},
+				pattern:  "CVE.2022-*",
+			},
+			want: nil,
+		},
+		{
+			// 多种特殊字符混合，验证转义后能正常编译且字面匹配
+			// pattern "CVE-[2022-*" 中 [ 被转义为 \[ ，CVE 不含 [ → nil
+			name: "bracket char escaped",
+			args: args{
+				cveSlice: []string{"CVE-2022-1111"},
+				pattern:  "CVE-[2022-*",
+			},
+			want: nil,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

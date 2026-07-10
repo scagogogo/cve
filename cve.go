@@ -31,4 +31,11 @@ package cve
 // - X: 主版本号，不兼容的API修改
 // - Y: 次版本号，向后兼容的功能性新增
 // - Z: 修订号，向后兼容的问题修正
-const Version = "v0.0.1"
+//
+// 默认值为 "dev"，正式版本通过 goreleaser/ldflags 在构建期注入：
+//
+//	go build -ldflags "-X github.com/scagogogo/cve-skills.Version=v1.2.3"
+//
+// 该变量声明为 var 而非 const，正是因为 ldflags 需要在链接期覆盖它。
+// 不可改为 const，否则注入将静默失效。
+var Version = "dev"

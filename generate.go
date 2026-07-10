@@ -153,7 +153,10 @@ func ParseCveRange(rangeExpr string) []string {
 		return nil
 	}
 
-	// 结束序列号可能在 to/dot-dot/dash 分组中
+	// 结束序列号可能在 to/dot-dot/dash 分组中。
+	// rangeRegex 的结构（(?:to…(\d+)|…(\d+)|…(\d+))）保证 matches[3..5]
+	// 恰有一个非空，故无需 default 分支；若不变式被破坏，下方
+	// startSeq > endSeq 检查会兜底返回 nil。
 	var endSeq int
 	switch {
 	case matches[3] != "":
@@ -162,8 +165,6 @@ func ParseCveRange(rangeExpr string) []string {
 		endSeq, err = strconv.Atoi(matches[4])
 	case matches[5] != "":
 		endSeq, err = strconv.Atoi(matches[5])
-	default:
-		return nil
 	}
 	if err != nil || startSeq > endSeq {
 		return nil

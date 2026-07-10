@@ -458,6 +458,26 @@ func TestValidateCves(t *testing.T) {
 				{Cve: "CVE-2022-0", Valid: false, Reason: "sequence number must be positive"},
 			},
 		},
+		{
+			// 年份超出 int 范围，Atoi(year) 失败 → 覆盖 base.go:341-345 yearErr 分支
+			name: "year overflow invalid",
+			args: args{
+				cveSlice: []string{"CVE-99999999999999999999999999-1234"},
+			},
+			want: []CveValidationResult{
+				{Cve: "CVE-99999999999999999999999999-1234", Valid: false, Reason: "year is not a valid number"},
+			},
+		},
+		{
+			// 序列号超出 int 范围，Atoi(seq) 失败 → 覆盖 base.go:347-351 seqErr 分支
+			name: "sequence overflow invalid",
+			args: args{
+				cveSlice: []string{"CVE-2022-99999999999999999999999999"},
+			},
+			want: []CveValidationResult{
+				{Cve: "CVE-2022-99999999999999999999999999", Valid: false, Reason: "sequence number is not a valid number"},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -644,6 +664,16 @@ func TestFormatSeq(t *testing.T) {
 				width: 6,
 			},
 			want: "CVE-2022-000123",
+		},
+		{
+			// 序列号超出 int 范围，strconv.Atoi 失败 → 原样返回
+			// 覆盖 base.go:85-87 的 err 分支（IsCve 通过但 Atoi 溢出）
+			name: "sequence overflow returns as-is",
+			args: args{
+				cve:   "CVE-2022-99999999999999999999999999",
+				width: 6,
+			},
+			want: "CVE-2022-99999999999999999999999999",
 		},
 	}
 	for _, tt := range tests {

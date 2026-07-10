@@ -313,10 +313,9 @@ func FilterCvesByPattern(cveSlice []string, pattern string) []string {
 		}
 	}
 
-	regex, err := regexp.Compile(string(regexParts))
-	if err != nil {
-		return nil
-	}
+	// 转换逻辑已将所有正则特殊字符转义为字面字符，* 转为 .*，
+	// 产出的正则必然可编译，故用 MustCompile 表达此不变式。
+	regex := regexp.MustCompile(string(regexParts))
 
 	var result []string
 	for _, cve := range cveSlice {
