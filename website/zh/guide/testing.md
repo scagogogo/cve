@@ -189,6 +189,15 @@ go tool cover -func=merged.out | grep '/cmd/'
 
 `examples/` 目录（33 个可运行的 `main` 包）被刻意排除在覆盖率目标之外——它们是示例程序，非被测代码。
 
+## 统一单一覆盖率视图
+
+库（`go test .`）与 CLI 双 profile 合并各自报告 100%，但单一 `go test -coverpkg ./...` 无法捕获子进程覆盖（CLI 的 `Run` 闭包在派生进程中执行）。`make coverage` 用 Go 1.20+ 的 `-test.gocoverdir` 让进程内测试也产出 covdir 格式，与子进程 `GOCOVERDIR` 格式统一，再用纯 Go 的 `go tool covdata merge -pcombine` 合并两类 covdir 成单一目录，经 `textfmt` 转标准 `mode: set` profile——`go tool cover -func coverage.out` 对此单一 profile 报告 100.0%（库 + cmd）。
+
+```bash
+make coverage   # 产出 coverage.out，单一视图 100.0%
+make test       # 常规单测，快速反馈
+```
+
 ## 数据流
 
 ```text

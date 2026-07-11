@@ -25,12 +25,12 @@ jobs:
       run: go test -v ./...
 
     - name: 生成测试覆盖率报告
-      run: go test -race -coverprofile=coverage.txt -covermode=atomic ./...
+      run: make coverage
 
     - name: 上传覆盖率报告
       uses: codecov/codecov-action@v3
       with:
-        file: ./coverage.txt
+        file: ./coverage.out
         fail_ci_if_error: false
 
   examples:

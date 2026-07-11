@@ -189,6 +189,15 @@ go tool cover -func=merged.out | grep '/cmd/'
 
 The `examples/` directory (33 runnable `main` packages) is deliberately excluded from the coverage target — those are demonstration programs, not code under test.
 
+## Unified Single-Profile Coverage
+
+The library (`go test .`) and the CLI dual-profile merge each report 100%, but a single `go test -coverpkg ./...` cannot capture subprocess coverage (the CLI `Run` closures execute in spawned processes). `make coverage` uses Go 1.20+ `-test.gocoverdir` to make in-process tests also emit covdir format, unifies it with subprocess `GOCOVERDIR` covdir, then merges both via pure-Go `go tool covdata merge -pcombine` into a single directory and converts to a standard `mode: set` profile via `textfmt` — `go tool cover -func coverage.out` reports 100.0% for lib + cmd in this single view.
+
+```bash
+make coverage   # produces coverage.out, single-view 100.0%
+make test       # plain unit tests, fast feedback
+```
+
 ## Data Flow
 
 ```text
