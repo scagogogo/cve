@@ -230,21 +230,34 @@ func TestCLIUnknownCommand(t *testing.T) {
 }
 
 // TestMain 合并子进程覆盖数据并清理持久二进制目录。
-//
-// go test -coverprofile 只收集测试进程内的覆盖（readInputs 等），不收集 go build -cover
 // 子进程二进制的覆盖（Execute、version 的 Run 闭包等）。子进程运行时设置 GOCOVERDIR，
 // 把覆盖数据写入该目录；runCve 把每个 coverDir 注册到 collectedCoverDirs，这里统一合并：
 //
 //	go tool covdata merge -i=<dir1>,<dir2>,... -o=<mergeddir>   // 合并多个 GOCOVERDIR
 //	go tool covdata textfmt -i=<mergeddir> -o=<profile.out>     // 转标准 mode: set profile
 //
-// 最终 profile 路径取自 GOCOVER_SUBPROCESS_OUT 环境变量，与 go test -coverprofile 互补。
-// 注意 covdata 的 -i 用逗号分隔目录（非 os.PathListSeparator 冒号）。
+// 两条互斥路径：
+//   - GOCOVER_SUBPROCESS_OUT=<file>：旧路径，TestMain 内部 merge+textfmt 输出单一 profile，删各 coverDir
+//   - GOCOVER_SUBPROCESS_DIRS=<file>：新路径，把 collectedCoverDirs 路径列表写入该文件，不合并不删，
+//     供外部 Makefile 与进程内 covdir 一并用 covdata merge -pcombine 统一合并成全仓库单一 profile
 func TestMain(m *testing.M) {
 	code := m.Run()
 
-	// 合并子进程覆盖数据为单一 profile。coverDir 用 os.MkdirTemp 持久化（非 t.TempDir，
-	// 否则 t 结束即清理，此处合并时目录已不存在）。covdata 的 -i 用逗号分隔目录。
+	// 持久 coverDir 列表优先交给外部合并（纯 Go covdata merge 路径）
+	if dirsFile := os.Getenv("GOCOVER_SUBPROCESS_DIRS"); dirsFile != "" && len(collectedCoverDirs) > 0 {
+		content := []byte(strings.Join(collectedCoverDirs, "\n") + "\n")
+		if err := os.WriteFile(dirsFile, content, 0o644); err != nil {
+			fmt.Fprintf(os.Stderr, "write GOCOVER_SUBPROCESS_DIRS: %v\n", err)
+		}
+		// 保留 coverDir 供外部 merge，不清理
+		// 仅清理二进制目录
+		if coverBinaryDir != "" {
+			os.RemoveAll(coverBinaryDir)
+		}
+		os.Exit(code)
+	}
+
+	// 旧路径：内部 merge+textfmt 输出单一 profile
 	if finalOut := os.Getenv("GOCOVER_SUBPROCESS_OUT"); finalOut != "" && len(collectedCoverDirs) > 0 {
 		merged, err := os.MkdirTemp("", "cve-cover-merged-*")
 		if err == nil {
