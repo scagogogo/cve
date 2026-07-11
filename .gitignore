@@ -31,3 +31,6 @@ website/.vitepress/cache/
 
 # goreleaser build output
 dist/
+
+# Superpowers planning docs (work artifacts, not source)
+docs/superpowers/plans/
